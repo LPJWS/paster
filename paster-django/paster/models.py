@@ -61,3 +61,15 @@ class ConfirmCode(models.Model):
     def save(self, *args, **kwargs):
         self.code = random.randint(1000, 9999)
         super(ConfirmCode, self).save(*args, **{})
+
+
+class Member(models.Model):
+    """
+    [Member]
+    Модель участника проекта
+    """
+    vk_id = models.IntegerField(unique=True, verbose_name='VK id')
+
+    class Meta:
+        verbose_name = 'Участник'
+        verbose_name_plural = 'Участники'

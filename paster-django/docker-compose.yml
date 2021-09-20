@@ -23,11 +23,22 @@ services:
     ports:
       - "5431:5432"
 
+  paster-bot:
+    restart: always
+    build: ./bot
+    env_file: .env
+    container_name: paster-bot
+    command: bash -c "python paster.py"
+    volumes:
+      - ./bot:/bot
+    depends_on:
+      - paster-web
+
   celery-paster:
     restart: unless-stopped
     build: .
-    command: celery -A configs.celery worker -l info --loglevel=DEBUG --concurrency=2
-    container_name: celery_web_fit
+    command: celery -A configs.celery worker -l info --concurrency=2
+    container_name: celery_web_paster
     env_file: .env
     volumes:
       - .:/site
@@ -41,8 +52,8 @@ services:
   celery-beat-web:
     restart: unless-stopped
     build: .
-    command: /bin/bash -c " rm -f /site/celerybeat.pid; celery -A configs.celery beat -l DEBUG "
-    container_name: celery_beat_web
+    command: /bin/bash -c " rm -f /site/celerybeat.pid; celery -A configs.celery beat"
+    container_name: celery_beat_paster
     env_file: .env
     volumes:
       - .:/site

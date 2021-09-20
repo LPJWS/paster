@@ -9,8 +9,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
 
-from paster.models import Broadcast, BroadcastNotifications, User
-from fcm_django.models import FCMDevice
+from paster.models import User
 
 from datetime import datetime, timedelta
 

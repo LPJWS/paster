@@ -1,9 +1,6 @@
 import re
 from django.db.models.deletion import SET_NULL
 from django.shortcuts import render
-
-from fcm_django.api.rest_framework import FCMDeviceAuthorizedViewSet
-from fcm_django.models import FCMDevice
 from rest_framework import status, generics, viewsets
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -110,3 +107,14 @@ class UserView(viewsets.ViewSet):
     @action(methods=['GET'], detail=False, url_path='me', url_name='About User', permission_classes=[IsAuthenticated])
     def about_user(self, request, *args, **kwargs):
         return Response(UserDetailSerializer(instance=request.user, context={"request": request}).data, status=status.HTTP_200_OK)
+
+
+class TestView(viewsets.ViewSet):
+    """
+    Тестовый вьюв
+    """
+    permission_classes = (AllowAny, )
+
+    @action(methods=['GET'], detail=False, url_path='test', url_name='Test', permission_classes=permission_classes)
+    def test(self, request, *args, **kwargs):
+        return Response({'response': 'Отсоси'}, status=status.HTTP_200_OK)

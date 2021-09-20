@@ -20,10 +20,3 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'configs.settings')
 app = Celery('apps')
 app.config_from_object(CeleryConfig)
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
-
-app.conf.beat_schedule = {
-    "check_broadcasts": {
-        "task": 'paster.tasks.check_broadcasts',
-        "schedule": 10.0
-    }
-}
