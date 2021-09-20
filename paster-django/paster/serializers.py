@@ -118,3 +118,14 @@ class UserUpdateSerializer(BaseImageSerializer):
     class Meta:
         model = User
         fields = ['username', 'name', 'photo', 'old_password', 'new_password']
+
+
+class PasteSerializer(BaseImageSerializer):
+    """
+    Сериализатор для детального отображения пользователя
+    """
+    avg = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Paste
+        fields = '__all__'

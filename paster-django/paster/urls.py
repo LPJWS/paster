@@ -7,7 +7,7 @@ from paster.views import *
 router = SimpleRouter()
 router.register(r'auth', AuthView, basename='auth')
 router.register(r'user', UserView, basename='user')
-router.register(r'test', TestView, basename='test')
+router.register(r'paste', PasteView, basename='paste')
 
 urlpatterns = [
     # path('auth/send/', reset_password),

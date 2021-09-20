@@ -109,12 +109,14 @@ class UserView(viewsets.ViewSet):
         return Response(UserDetailSerializer(instance=request.user, context={"request": request}).data, status=status.HTTP_200_OK)
 
 
-class TestView(viewsets.ViewSet):
+class PasteView(viewsets.ViewSet):
     """
-    Тестовый вьюв
+    Работа с пастами
     """
     permission_classes = (AllowAny, )
+    serializer_class = PasteSerializer
 
-    @action(methods=['GET'], detail=False, url_path='test', url_name='Test', permission_classes=permission_classes)
-    def test(self, request, *args, **kwargs):
-        return Response({'response': 'Отсоси'}, status=status.HTTP_200_OK)
+    @action(methods=['GET'], detail=False, url_path='get/(?P<id>[^/]+)', url_name='Get paste', permission_classes=permission_classes)
+    def get_paste(self, request, id, *args, **kwargs):
+        paste = Paste.objects.get(id=id)
+        return Response(self.serializer_class(instance=paste).data, status=status.HTTP_200_OK)

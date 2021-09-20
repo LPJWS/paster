@@ -3,7 +3,7 @@ from django.utils import timezone
 from email.policy import default
 import random
 from typing import List
-from django.db.models.deletion import CASCADE
+from django.db.models.deletion import CASCADE, SET_NULL
 import jwt as jwt
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -73,3 +73,38 @@ class Member(models.Model):
     class Meta:
         verbose_name = 'Участник'
         verbose_name_plural = 'Участники'
+
+
+class Paste(models.Model):
+    """
+    [Paste]
+    Модель пасты
+    """
+    link = models.CharField(max_length=150, verbose_name='Ссылка на пасту')
+
+    @property
+    def avg(self) -> float:
+        marks = Mark.objects.filter(paste=self)
+        marks_list = [mark.mark for mark in marks]
+        if len(marks_list):
+            return sum(marks_list)/len(marks_list)
+        else:
+            return 0
+
+    class Meta:
+        verbose_name = 'Паста'
+        verbose_name_plural = 'Пасты'
+
+
+class Mark(models.Model):
+    """
+    [Mark]
+    Модель оценки пасты
+    """
+    member = models.ForeignKey(Member, null=True, blank=True, on_delete=SET_NULL)
+    paste = models.ForeignKey(Paste, on_delete=CASCADE)
+    mark = models.IntegerField(default=5, verbose_name='Оценка')
+
+    class Meta:
+        verbose_name = 'Оценка пасты'
+        verbose_name_plural = 'Оценки паст'
