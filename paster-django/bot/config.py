@@ -8,7 +8,7 @@ def get_main_keyboard():
     return keyboard.get_keyboard()
 
 service = os.environ.get('VK_SERVICE')
-token = "f75c41ae1d9584d7b7062d12427aae7d75d963bf37619642d31378a94e2b07aa7fd6df12f8d638522e7e6"
+token = os.environ.get('VK_TOKEN')
 group_id = 207290394
 main_keyboard = get_main_keyboard()
 groups = ['108531402', '92157416']
