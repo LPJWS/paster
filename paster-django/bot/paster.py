@@ -156,10 +156,10 @@ if __name__ == '__main__':
 
                     if text.lower() == 'топ':
                         response = api('http://paster-web:8000/api/v1/paste/get/top/')
-                        mess = "Лучшие пасты:\n"
+                        mess = "Лучшие пасты:\n\n"
                         i = 1
                         for paste in response:
-                            mess += f"{i}. {paste['link']} - {paste['avg']}\n"
+                            mess += f"{i}. {paste['link']} - {paste['avg']} - {paste['cnt']}\n\n"
                         vk.messages.send(
                             chat_id=chat_id, 
                             random_id=get_random_id(),
@@ -243,10 +243,10 @@ if __name__ == '__main__':
 
                     if text.lower() == 'топ':
                         response = api('http://paster-web:8000/api/v1/paste/get/top/')
-                        mess = "Лучшие пасты:\n"
+                        mess = "Лучшие пасты:\n\n"
                         i = 1
                         for paste in response:
-                            mess += f"{i}. {paste['link']} - {paste['avg']}\n"
+                            mess += f"{i}. {paste['link']} - {paste['avg']} - {paste['cnt']}\n\n"
                         vk.messages.send(
                             user_id=from_id, 
                             random_id=get_random_id(),
