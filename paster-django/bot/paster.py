@@ -45,6 +45,7 @@ def paste_keyboard(data={}):
 
     keyboard.add_button('Паста', color=VkKeyboardColor.PRIMARY)
     keyboard.add_button('Случайная паста', color=VkKeyboardColor.PRIMARY)
+    keyboard.add_button('ТОП', color=VkKeyboardColor.PRIMARY)
     return keyboard.get_keyboard()
 
 
@@ -71,11 +72,7 @@ if __name__ == '__main__':
                 from_id = event.obj.from_id
 
                 if is_for_bot(text):
-                    text_ = text.split(' ')[1:]
-                    text = ""
-                    for t in text_:
-                        text += t + " "
-                    text = text[:-1]
+                    text = text.split(']')[1][1:]
 
                 if event.from_chat:
                     chat_id = event.chat_id
@@ -99,27 +96,29 @@ if __name__ == '__main__':
                     
                     if text.lower() in ('1', '2', '3', '4', '5') and 'payload' in event.object:
                         mark = text.lower()
+                        paste_id = json.loads(event.object['payload'])['paste']
                         response = api(
                             'http://paster-web:8000/api/v1/paste/relate/', 
                             method='post', 
                             data={
-                                'id': json.loads(event.object['payload'])['paste'],
+                                'id': paste_id,
                                 'vk_id': from_id,
                                 'mark': mark
                             }
                         )
+                        paste_response = api(f'http://paster-web:8000/api/v1/paste/get/{paste_id}/')
                         if response['status'] == 'ok':
                             vk.messages.send(
                                 chat_id=chat_id,  
                                 random_id=get_random_id(), 
-                                message=f"Успешно оценено на {mark}",
+                                message=f"[id{from_id}|Вы] успешно оцененили пасту {paste_response['link']} на {mark}",
                                 reply_to=event.object['id']
                             )
                         else:
                             vk.messages.send(
                                 chat_id=chat_id,
                                 random_id=get_random_id(), 
-                                message=f"Уже оценено",
+                                message=f"[id{from_id}|Вы] уже оцененили данную ({paste_response['link']}) пасту!",
                                 reply_to=event.object['id']
                             )
 
@@ -153,6 +152,20 @@ if __name__ == '__main__':
                                 keyboard=paste_keyboard({'paste': response['id']}),
                                 attachment=attachment
                             )
+                        continue
+
+                    if text.lower() == 'топ':
+                        response = api('http://paster-web:8000/api/v1/paste/get/top/')
+                        mess = "Лучшие пасты:\n"
+                        i = 1
+                        for paste in response:
+                            mess += f"{i}. {paste['link']} - {paste['avg']}\n"
+                        vk.messages.send(
+                            chat_id=chat_id, 
+                            random_id=get_random_id(),
+                            message=mess,
+                            keyboard=config.main_keyboard
+                        )
                         continue
                     pass
                 else:
@@ -226,6 +239,20 @@ if __name__ == '__main__':
                                 keyboard=paste_keyboard({'paste': response['id']}),
                                 attachment=attachment
                             )
+                        continue
+
+                    if text.lower() == 'топ':
+                        response = api('http://paster-web:8000/api/v1/paste/get/top/')
+                        mess = "Лучшие пасты:\n"
+                        i = 1
+                        for paste in response:
+                            mess += f"{i}. {paste['link']} - {paste['avg']}\n"
+                        vk.messages.send(
+                            user_id=from_id, 
+                            random_id=get_random_id(),
+                            message=mess,
+                            keyboard=config.main_keyboard
+                        )
                         continue
                     pass
         except Exception as e:

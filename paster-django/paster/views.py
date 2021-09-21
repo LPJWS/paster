@@ -164,3 +164,9 @@ class PasteView(viewsets.ViewSet):
         serializer.is_valid(raise_exception=True)
         paste = serializer.save()
         return Response(self.serializer_class(instance=paste).data)
+
+
+    @action(methods=['GET'], detail=False, url_path='get/top', url_name='Get top pastes', permission_classes=permission_classes)
+    def get_top(self, request, *args, **kwargs):
+        pastes = sorted(Paste.objects.all(), key=lambda t: t.avg, reverse=True)
+        return Response(self.serializer_class(instance=pastes, many=True).data, status=status.HTTP_200_OK)
