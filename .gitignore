@@ -55,3 +55,4 @@ Thumbs.db
 
 paster-django/celerybeat.pid
 paster-django/celerybeat-schedule
+paster-django/.env
