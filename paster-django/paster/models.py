@@ -70,6 +70,9 @@ class Member(models.Model):
     """
     vk_id = models.IntegerField(unique=True, verbose_name='VK id')
 
+    def __str__(self) -> str:
+        return f"{self.vk_id}"
+
     class Meta:
         verbose_name = 'Участник'
         verbose_name_plural = 'Участники'
@@ -97,6 +100,9 @@ class Paste(models.Model):
         marks = Mark.objects.filter(paste=self)
         return len(marks)
 
+    def __str__(self) -> str:
+        return f"{self.link}"
+
     class Meta:
         verbose_name = 'Паста'
         verbose_name_plural = 'Пасты'
@@ -110,6 +116,9 @@ class Mark(models.Model):
     member = models.ForeignKey(Member, null=True, blank=True, on_delete=SET_NULL)
     paste = models.ForeignKey(Paste, on_delete=CASCADE)
     mark = models.IntegerField(default=5, verbose_name='Оценка')
+
+    def __str__(self) -> str:
+        return f"{self.member.vk_id} ({self.paste.link}) (self.mark)"
 
     class Meta:
         verbose_name = 'Оценка пасты'
