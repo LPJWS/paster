@@ -1,0 +1,84 @@
+version: '2'
+services:
+
+  paster-web:
+    restart: always
+    build: .
+    env_file: .env
+    container_name: paster-web
+    command: bash -c "rm -rf celerybeat.pid && python manage.py collectstatic --no-input && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/site
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgresql-paster
+
+  postgresql-paster:
+    image: postgres:12
+    container_name: db_paster
+    env_file: .env
+    volumes:
+      - db-paster:/var/lib/postgresql/data/pgdata
+    ports:
+      - "5431:5432"
+
+  paster-bot:
+    restart: always
+    build: ./bot
+    env_file: .env
+    container_name: paster-bot
+    command: bash -c "python paster.py"
+    volumes:
+      - ./bot:/bot
+    depends_on:
+      - paster-web
+
+  celery-paster:
+    restart: unless-stopped
+    build: .
+    command: celery -A configs.celery worker -l info --concurrency=2
+    container_name: celery_web_paster
+    env_file: .env
+    volumes:
+      - .:/site
+    links:
+      - postgresql-paster
+    depends_on:
+      - paster-web
+      - postgresql-paster
+      - redis-web-paster
+
+  celery-beat-web:
+    restart: unless-stopped
+    build: .
+    command: /bin/bash -c " rm -f /site/celerybeat.pid; celery -A configs.celery beat"
+    container_name: celery_beat_paster
+    env_file: .env
+    volumes:
+      - .:/site
+    depends_on:
+      - paster-web
+      - postgresql-paster
+      - redis-web-paster
+
+  flower-web-paster:
+    build: .
+    env_file: .env
+    command: /bin/bash -c "sleep 6 && celery flower -A configs.celery --port=5555 --basic_auth=admin:admin --pidfile /tmp/celery.pid"
+    container_name: flower_web_paster
+    volumes:
+      - .:/site
+    ports:
+      - "5555:5555"
+    depends_on:
+      - postgresql-paster
+      - redis-web-paster
+
+  redis-web-paster:
+    restart: always
+    image: redis:latest
+    container_name: redis_paster
+
+volumes:
+  db-paster:
