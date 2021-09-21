@@ -133,7 +133,7 @@ class PasteView(viewsets.ViewSet):
 
     @action(methods=['GET'], detail=False, url_path='get/unrelated', url_name='Get most unrelated paste', permission_classes=permission_classes)
     def get_unrelated(self, request, *args, **kwargs):
-        pastes = sorted(Paste.objects.all(), key=lambda t: t.avg)
+        pastes = sorted(Paste.objects.all(), key=lambda t: t.cnt)
 
         flag = True
         tmp_cnt = pastes[0].cnt
@@ -142,7 +142,7 @@ class PasteView(viewsets.ViewSet):
                 flag = False
         if flag and tmp_cnt != 0:
             paster.utils.accumulate()
-            pastes = sorted(Paste.objects.all(), key=lambda t: t.avg)
+            pastes = sorted(Paste.objects.all(), key=lambda t: t.cnt)
         
         return Response(self.serializer_class(instance=pastes[0]).data, status=status.HTTP_200_OK)
 
