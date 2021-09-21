@@ -54,6 +54,9 @@ REST_FRAMEWORK = {
         'paster.core.auth.JWTAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
 }
 
 MIDDLEWARE = [

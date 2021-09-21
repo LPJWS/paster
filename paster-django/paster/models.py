@@ -80,7 +80,8 @@ class Paste(models.Model):
     [Paste]
     Модель пасты
     """
-    link = models.CharField(max_length=150, verbose_name='Ссылка на пасту')
+    link = models.CharField(max_length=150, null=True, blank=True, verbose_name='Ссылка на пасту')
+    text = models.TextField(null=True, blank=True, verbose_name='Текст пасты')
 
     @property
     def avg(self) -> float:
@@ -90,6 +91,11 @@ class Paste(models.Model):
             return sum(marks_list)/len(marks_list)
         else:
             return 0
+
+    @property
+    def cnt(self) -> int:
+        marks = Mark.objects.filter(paste=self)
+        return len(marks)
 
     class Meta:
         verbose_name = 'Паста'

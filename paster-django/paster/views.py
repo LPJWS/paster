@@ -1,3 +1,4 @@
+from random import randint
 import re
 from django.db.models.deletion import SET_NULL
 from django.shortcuts import render
@@ -11,6 +12,8 @@ from django.contrib.auth.password_validation import validate_password
 from paster.models import ConfirmCode, User
 from paster.serializers import *
 from paster.tasks import *
+
+import paster.utils
 
 import os
 import json
@@ -116,7 +119,48 @@ class PasteView(viewsets.ViewSet):
     permission_classes = (AllowAny, )
     serializer_class = PasteSerializer
 
-    @action(methods=['GET'], detail=False, url_path='get/(?P<id>[^/]+)', url_name='Get paste', permission_classes=permission_classes)
+    @action(methods=['GET'], detail=False, url_path='get/(?P<id>\d+)', url_name='Get paste', permission_classes=permission_classes)
     def get_paste(self, request, id, *args, **kwargs):
         paste = Paste.objects.get(id=id)
         return Response(self.serializer_class(instance=paste).data, status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=False, url_path='get/rand', url_name='Get rand paste', permission_classes=permission_classes)
+    def get_rand(self, request, *args, **kwargs):
+        pastes = Paste.objects.all()
+        cnt = len(pastes)
+        rand_id = random.randint(0, cnt-1)
+        return Response(self.serializer_class(instance=pastes[rand_id]).data, status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=False, url_path='get/unrelated', url_name='Get most unrelated paste', permission_classes=permission_classes)
+    def get_unrelated(self, request, *args, **kwargs):
+        pastes = sorted(Paste.objects.all(), key=lambda t: t.avg)
+
+        flag = True
+        tmp_cnt = pastes[0].cnt
+        for paste in pastes[1:]:
+            if paste.cnt != tmp_cnt:
+                flag = False
+        if flag and tmp_cnt != 0:
+            paster.utils.accumulate()
+            pastes = sorted(Paste.objects.all(), key=lambda t: t.avg)
+        
+        return Response(self.serializer_class(instance=pastes[0]).data, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False, url_path='relate', url_name='Relate paste', permission_classes=permission_classes)
+    def relate(self, request, *args, **kwargs):
+        data = request.data
+        paste = Paste.objects.get(id=data.get('id'))
+        serializer = self.serializer_class(data=data, instance=paste)
+        serializer.is_valid(raise_exception=True)
+        if serializer.relate(instance=paste, validated_data=data):
+            return Response({'status': 'ok'})
+        else:
+            return Response({'status': 'already'})
+
+    @action(methods=['POST'], detail=False, url_path='add', url_name='Add paste to base', permission_classes=permission_classes)
+    def add_paste(self, request, *args, **kwargs):
+        data = request.data
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        paste = serializer.save()
+        return Response(self.serializer_class(instance=paste).data)

@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 from django.core.validators import ProhibitNullCharactersValidator
 from django.db.models import fields
-from django.utils.functional import empty
+import requests
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
@@ -11,6 +11,7 @@ from rest_framework.fields import FileField, SkipField, ImageField
 from rest_framework.relations import PKOnlyObject
 
 from .models import *
+import paster.utils
 
 class BaseImageSerializer(serializers.ModelSerializer):
 
@@ -125,6 +126,30 @@ class PasteSerializer(BaseImageSerializer):
     Сериализатор для детального отображения пользователя
     """
     avg = serializers.ReadOnlyField()
+    cnt = serializers.ReadOnlyField()
+    vk_id = serializers.IntegerField(write_only=True, required=False)
+    mark = serializers.IntegerField(write_only=True, required=False)
+    link = serializers.CharField(required=False)
+
+    def create(self, validated_data):
+        paste, created = Paste.objects.get_or_create(
+            link=validated_data.get('link'), 
+            text=paster.utils.get_text_by_id(validated_data.get('link'))
+        )
+        if created:
+            paste.save()
+        return paste
+
+    def relate(self, instance, validated_data):
+        member, created = Member.objects.get_or_create(vk_id=validated_data.get('vk_id'))
+        if created:
+            member.save()
+        mark, created = Mark.objects.get_or_create(member=member, paste=instance)
+        if created:
+            mark.mark = validated_data.get('mark')
+            mark.save()
+            return True
+        return False
 
     class Meta:
         model = Paste
