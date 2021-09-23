@@ -65,6 +65,7 @@ if __name__ == '__main__':
     while 1:
         try:
             for event in longpoll.listen():
+                print(event)
                 if event.type != VkBotEventType.MESSAGE_NEW:
                     continue
                 text = event.obj.text
@@ -76,6 +77,8 @@ if __name__ == '__main__':
 
                 if event.from_chat:
                     chat_id = event.chat_id
+                    mess_id = event.object['conversation_message_id']
+                    peer_id = event.object['peer_id']
 
                     if event.object['attachments'] \
                         and event.object['attachments'][0]['type'] == 'wall' \
@@ -89,7 +92,7 @@ if __name__ == '__main__':
                                 chat_id=chat_id, 
                                 random_id=get_random_id(), 
                                 message='Обнаружена паста\nОцените пожалуйста',
-                                attachment=attachment,
+                                forward=json.dumps({'peer_id': peer_id, 'is_reply': True, 'conversation_message_ids': [mess_id]}),
                                 keyboard=paste_keyboard({'paste': response['id']}),
                             )
                             continue
@@ -112,14 +115,12 @@ if __name__ == '__main__':
                                 chat_id=chat_id,  
                                 random_id=get_random_id(), 
                                 message=f"[id{from_id}|Вы] успешно оцененили пасту {paste_response['link']} на {mark}",
-                                reply_to=event.object['id']
                             )
                         else:
                             vk.messages.send(
                                 chat_id=chat_id,
                                 random_id=get_random_id(), 
                                 message=f"[id{from_id}|Вы] уже оцененили данную ({paste_response['link']}) пасту!",
-                                reply_to=event.object['id']
                             )
 
                     if text.lower() == 'паста':
@@ -156,10 +157,11 @@ if __name__ == '__main__':
 
                     if text.lower() == 'топ':
                         response = api('http://paster-web:8000/api/v1/paste/get/top/')
-                        mess = "Лучшие пасты:\n\n"
+                        mess = "Лучшие пасты:\nСсылка - средняя оценка - кол-во оценок\n\n"
                         i = 1
                         for paste in response:
                             mess += f"{i}. {paste['link']} - {paste['avg']} - {paste['cnt']}\n\n"
+                            i += 1
                         vk.messages.send(
                             chat_id=chat_id, 
                             random_id=get_random_id(),

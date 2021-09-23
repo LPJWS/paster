@@ -126,10 +126,13 @@ class PasteView(viewsets.ViewSet):
 
     @action(methods=['GET'], detail=False, url_path='get/rand', url_name='Get rand paste', permission_classes=permission_classes)
     def get_rand(self, request, *args, **kwargs):
+        if random.random() > 0.7:
+            paster.utils.accumulate()
         pastes = Paste.objects.all()
         cnt = len(pastes)
         rand_id = random.randint(0, cnt-1)
         return Response(self.serializer_class(instance=pastes[rand_id]).data, status=status.HTTP_200_OK)
+
 
     @action(methods=['GET'], detail=False, url_path='get/unrelated', url_name='Get most unrelated paste', permission_classes=permission_classes)
     def get_unrelated(self, request, *args, **kwargs):
@@ -143,8 +146,11 @@ class PasteView(viewsets.ViewSet):
         if flag and tmp_cnt != 0:
             paster.utils.accumulate()
             pastes = sorted(Paste.objects.all(), key=lambda t: t.cnt)
-        
-        return Response(self.serializer_class(instance=pastes[0]).data, status=status.HTTP_200_OK)
+            return Response(self.serializer_class(instance=pastes[0]).data, status=status.HTTP_200_OK)
+        else:
+            min_cnt = pastes[0].cnt
+            pastes = [x for x in pastes if x.cnt == min_cnt]
+            return Response(self.serializer_class(instance=pastes[random.randint(0, len(pastes)-1)]).data, status=status.HTTP_200_OK)
 
     @action(methods=['POST'], detail=False, url_path='relate', url_name='Relate paste', permission_classes=permission_classes)
     def relate(self, request, *args, **kwargs):
