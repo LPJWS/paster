@@ -158,7 +158,7 @@ class Mark(models.Model):
     mark = models.IntegerField(default=5, verbose_name='Оценка')
 
     def __str__(self) -> str:
-        return f"{self.member.name} ({self.paste.link}) ({self.mark})"
+        return f"{self.member.name} ({self.paste.anno}) ({self.mark})"
 
     class Meta:
         verbose_name = 'Оценка пасты'

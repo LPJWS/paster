@@ -16,3 +16,5 @@ group_id = os.environ.get('VK_GROUP_ID')
 main_keyboard = get_main_keyboard()
 groups = ['108531402', '92157416', '157651636']
 groups_minus = [-int(i) for i in groups]
+marks_keys = {'1️⃣⭐️': 1, '2️⃣⭐️': 2, '3️⃣⭐️': 3, '4️⃣⭐️': 4, '5️⃣⭐️': 5}
+marks_keys_inv = {v: k for k, v in marks_keys.items()}

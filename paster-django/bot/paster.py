@@ -35,11 +35,11 @@ def api(url, method='get', data={}):
 
 def paste_keyboard(data={}):
     keyboard = VkKeyboard(inline=True)
-    keyboard.add_button('1', color=VkKeyboardColor.NEGATIVE, payload={'paste': data['paste']})
-    keyboard.add_button('2', color=VkKeyboardColor.NEGATIVE, payload={'paste': data['paste']})
-    keyboard.add_button('3', color=VkKeyboardColor.PRIMARY, payload={'paste': data['paste']})
-    keyboard.add_button('4', color=VkKeyboardColor.POSITIVE, payload={'paste': data['paste']})
-    keyboard.add_button('5', color=VkKeyboardColor.POSITIVE, payload={'paste': data['paste']})
+    keyboard.add_button(config.marks_keys_inv[1], color=VkKeyboardColor.NEGATIVE, payload={'paste': data['paste']})
+    keyboard.add_button(config.marks_keys_inv[2], color=VkKeyboardColor.NEGATIVE, payload={'paste': data['paste']})
+    keyboard.add_button(config.marks_keys_inv[3], color=VkKeyboardColor.PRIMARY, payload={'paste': data['paste']})
+    keyboard.add_button(config.marks_keys_inv[4], color=VkKeyboardColor.POSITIVE, payload={'paste': data['paste']})
+    keyboard.add_button(config.marks_keys_inv[5], color=VkKeyboardColor.POSITIVE, payload={'paste': data['paste']})
 
     keyboard.add_line()
 
@@ -104,8 +104,8 @@ if __name__ == '__main__':
                             )
                             continue
                     
-                    if text.lower() in ('1', '2', '3', '4', '5') and 'payload' in event.object:
-                        mark = text.lower()
+                    if text in config.marks_keys.keys() and 'payload' in event.object:
+                        mark = config.marks_keys[text]
                         paste_id = json.loads(event.object['payload'])['paste']
                         response = api(
                             'http://paster-web:8000/api/v1/paste/relate/', 
@@ -216,8 +216,8 @@ if __name__ == '__main__':
                             )
                             continue
                     
-                    if text.lower() in ('1', '2', '3', '4', '5') and 'payload' in event.object:
-                        mark = text.lower()
+                    if text in config.marks_keys.keys() and 'payload' in event.object:
+                        mark = config.marks_keys[text]
                         response = api(
                             'http://paster-web:8000/api/v1/paste/relate/', 
                             method='post', 
