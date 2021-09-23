@@ -140,7 +140,6 @@ if __name__ == '__main__':
                             cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
                             mess = f'Данную пасту оценили {cnt} раз, рейтинг - {rating}⭐️'
-                            mess=''
                             vk.messages.send(
                                 chat_id=chat_id, 
                                 random_id=get_random_id(), 
