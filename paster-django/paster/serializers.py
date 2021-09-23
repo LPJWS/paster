@@ -142,9 +142,12 @@ class PasteSerializer(BaseImageSerializer):
         return paste
 
     def relate(self, instance, validated_data):
-        member_serializer = MemberSerializer(data=validated_data)
-        member_serializer.is_valid(raise_exception=True)
-        member = member_serializer.save()
+        try:
+            member = Member.objects.get(vk_id=validated_data.get('vk_id'))
+        except User.DoesNotExist:
+            member_serializer = MemberSerializer(data=validated_data)
+            member_serializer.is_valid(raise_exception=True)
+            member = member_serializer.save()
         mark, created = Mark.objects.get_or_create(member=member, paste=instance)
         if created:
             mark.mark = validated_data.get('mark')
@@ -165,12 +168,12 @@ class MemberSerializer(BaseImageSerializer):
     cnt = serializers.ReadOnlyField()
 
     def create(self, validated_data):
-        name = paster.utils.get_name_by_id(validated_data.get('vk_id'))
         member, created = Member.objects.get_or_create(
-            vk_id=validated_data.get('vk_id'),
-            name=name
+            vk_id=validated_data.get('vk_id')
         )
         if created:
+            name = paster.utils.get_name_by_id(validated_data.get('vk_id'))
+            member.name = name
             member.save()
         return member
 
