@@ -10,6 +10,15 @@ from paster.models import *
 VK_SERVICE = os.environ.get('VK_SERVICE')
 GROUPS = ['108531402', '92157416', '157651636']
 
+
+def get_name_by_id(user_id):
+    vk_session = vk_api.VkApi(token=VK_SERVICE)
+    vk = vk_session.get_api()
+    t = vk.users.get(user_ids=(user_id,), lang='ru')[0]
+    print(t)
+    return t['first_name'] + ' ' + t['last_name'] 
+
+
 def send_email(m: str, to: str, s: str):
     msg = MIMEMultipart()
 

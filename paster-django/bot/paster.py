@@ -45,8 +45,15 @@ def paste_keyboard(data={}):
 
     keyboard.add_button('Паста', color=VkKeyboardColor.PRIMARY)
     keyboard.add_button('Случайная паста', color=VkKeyboardColor.PRIMARY)
+    keyboard.add_line()
     keyboard.add_button('ТОП', color=VkKeyboardColor.PRIMARY)
+    keyboard.add_button('ТОП Участников', color=VkKeyboardColor.PRIMARY)
     return keyboard.get_keyboard()
+
+
+def get_name_by_id(user_id):
+    t = vk.users.get(user_ids=(user_id,))[0]
+    return t['first_name'] + ' ' + t['last_name'] 
 
 
 if __name__ == '__main__':
@@ -157,7 +164,7 @@ if __name__ == '__main__':
 
                     if text.lower() == 'топ':
                         response = api('http://paster-web:8000/api/v1/paste/get/top/')
-                        mess = "Лучшие пасты:\nСсылка - средняя оценка - кол-во оценок\n\n"
+                        mess = "Лучшие пасты:\n\nСсылка - средняя оценка - кол-во оценок\n\n"
                         i = 1
                         for paste in response:
                             mess += f"{i}. {paste['link']} - {paste['avg']} - {paste['cnt']}\n\n"
@@ -169,6 +176,22 @@ if __name__ == '__main__':
                             keyboard=config.main_keyboard
                         )
                         continue
+
+                    if text.lower() == 'топ участников':
+                        response = api('http://paster-web:8000/api/v1/member/get/top/')
+                        mess = "Лучшие участники:\n\nУчастник - кол-во оценок - средняя оценка\n\n"
+                        i = 1
+                        for member in response:
+                            mess += f"{i}. [id{member['vk_id']}|{member['name']}] - {member['cnt']} - {member['avg']}\n\n"
+                            i += 1
+                        vk.messages.send(
+                            chat_id=chat_id, 
+                            random_id=get_random_id(),
+                            message=mess,
+                            keyboard=config.main_keyboard
+                        )
+                        continue
+
                     pass
                 else:
                     if event.object['attachments'] \
@@ -245,10 +268,26 @@ if __name__ == '__main__':
 
                     if text.lower() == 'топ':
                         response = api('http://paster-web:8000/api/v1/paste/get/top/')
-                        mess = "Лучшие пасты:\nСсылка - средняя оценка - кол-во оценок\n\n"
+                        mess = "Лучшие пасты:\n\nСсылка - средняя оценка - кол-во оценок\n\n"
                         i = 1
                         for paste in response:
                             mess += f"{i}. {paste['link']} - {paste['avg']} - {paste['cnt']}\n\n"
+                            i += 1
+                        vk.messages.send(
+                            user_id=from_id, 
+                            random_id=get_random_id(),
+                            message=mess,
+                            keyboard=config.main_keyboard
+                        )
+                        continue
+                    pass
+
+                    if text.lower() == 'топ участников':
+                        response = api('http://paster-web:8000/api/v1/member/get/top/')
+                        mess = "Лучшие участники:\n\nУчастник - кол-во оценок - средняя оценка\n\n"
+                        i = 1
+                        for member in response:
+                            mess += f"{i}. [id{member['vk_id']}|{member['name']}] - {member['cnt']} - {member['avg']}\n\n"
                             i += 1
                         vk.messages.send(
                             user_id=from_id, 

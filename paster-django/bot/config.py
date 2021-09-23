@@ -5,7 +5,9 @@ def get_main_keyboard():
     keyboard = VkKeyboard(inline=True)
     keyboard.add_button('Паста', color=VkKeyboardColor.PRIMARY)
     keyboard.add_button('Случайная паста', color=VkKeyboardColor.PRIMARY)
+    keyboard.add_line()
     keyboard.add_button('ТОП', color=VkKeyboardColor.PRIMARY)
+    keyboard.add_button('ТОП Участников', color=VkKeyboardColor.PRIMARY)
     return keyboard.get_keyboard()
 
 service = os.environ.get('VK_SERVICE')

@@ -1,5 +1,6 @@
 import os
 from collections import OrderedDict
+from django import utils
 
 from django.core.validators import ProhibitNullCharactersValidator
 from django.db.models import fields
@@ -141,9 +142,9 @@ class PasteSerializer(BaseImageSerializer):
         return paste
 
     def relate(self, instance, validated_data):
-        member, created = Member.objects.get_or_create(vk_id=validated_data.get('vk_id'))
-        if created:
-            member.save()
+        member_serializer = MemberSerializer(data=validated_data)
+        member_serializer.is_valid(raise_exception=True)
+        member = member_serializer.save()
         mark, created = Mark.objects.get_or_create(member=member, paste=instance)
         if created:
             mark.mark = validated_data.get('mark')
@@ -153,4 +154,26 @@ class PasteSerializer(BaseImageSerializer):
 
     class Meta:
         model = Paste
+        fields = '__all__'
+
+
+class MemberSerializer(BaseImageSerializer):
+    """
+    Сериализатор для детального отображения пользователя
+    """
+    avg = serializers.ReadOnlyField()
+    cnt = serializers.ReadOnlyField()
+
+    def create(self, validated_data):
+        name = paster.utils.get_name_by_id(validated_data.get('vk_id'))
+        member, created = Member.objects.get_or_create(
+            vk_id=validated_data.get('vk_id'),
+            name=name
+        )
+        if created:
+            member.save()
+        return member
+
+    class Meta:
+        model = Member
         fields = '__all__'

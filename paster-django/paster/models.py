@@ -69,9 +69,24 @@ class Member(models.Model):
     Модель участника проекта
     """
     vk_id = models.IntegerField(unique=True, verbose_name='VK id')
+    name = models.CharField(max_length=75, null=True, blank=True, verbose_name='Имя')
 
     def __str__(self) -> str:
-        return f"{self.vk_id}"
+        return f"{self.name} ({self.vk_id})"
+
+    @property
+    def avg(self) -> float:
+        marks = Mark.objects.filter(member=self)
+        marks_list = [mark.mark for mark in marks]
+        if len(marks_list):
+            return sum(marks_list)/len(marks_list)
+        else:
+            return 0
+
+    @property
+    def cnt(self) -> int:
+        marks = Mark.objects.filter(member=self)
+        return len(marks)
 
     class Meta:
         verbose_name = 'Участник'
@@ -113,7 +128,7 @@ class Mark(models.Model):
     [Mark]
     Модель оценки пасты
     """
-    member = models.ForeignKey(Member, null=True, blank=True, on_delete=SET_NULL)
+    member = models.ForeignKey(Member, null=True, blank=True, on_delete=CASCADE)
     paste = models.ForeignKey(Paste, on_delete=CASCADE)
     mark = models.IntegerField(default=5, verbose_name='Оценка')
 
