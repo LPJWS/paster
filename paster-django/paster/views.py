@@ -136,6 +136,9 @@ class PasteView(viewsets.ViewSet):
 
     @action(methods=['GET'], detail=False, url_path='get/unrelated', url_name='Get most unrelated paste', permission_classes=permission_classes)
     def get_unrelated(self, request, *args, **kwargs):
+        if random.random() > 0.7:
+            paster.utils.accumulate()
+
         pastes = sorted(Paste.objects.all(), key=lambda t: t.cnt)
 
         flag = True
