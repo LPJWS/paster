@@ -14,6 +14,7 @@ from django.db.models import Avg, Sum, Count
 from .validators import *
 
 from math import sqrt
+import re
 
 
 class User(AbstractUser):
@@ -132,8 +133,15 @@ class Paste(models.Model):
         rating = (phat+z*z/(2*n)-z*sqrt((phat*(1-phat)+z*z/(4*n))/n))/(1+z*z/n)
         return round(rating * v_width + v_min, 2)
 
+    @property
+    def anno(self) -> str:
+        result = self.text
+        result = re.sub(r"\s+|\n|\r|\s+|\#\w+", ' ', result)
+        
+        return ' '.join(result.strip().split()[:5]) + '...'
+
     def __str__(self) -> str:
-        return f"{self.link}"
+        return f"{self.anno} ({self.link})"
 
     class Meta:
         verbose_name = 'Паста'

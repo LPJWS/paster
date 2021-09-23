@@ -121,13 +121,13 @@ if __name__ == '__main__':
                             vk.messages.send(
                                 chat_id=chat_id,  
                                 random_id=get_random_id(), 
-                                message=f"[id{from_id}|Вы] успешно оцененили пасту {paste_response['link']} на {mark}",
+                                message=f"[id{from_id}|Вы] успешно оценили пасту \"{paste_response['anno']}\" на {mark}⭐️",
                             )
                         else:
                             vk.messages.send(
                                 chat_id=chat_id,
                                 random_id=get_random_id(), 
-                                message=f"[id{from_id}|Вы] уже оцененили данную ({paste_response['link']}) пасту!",
+                                message=f"[id{from_id}|Вы] уже оценили пасту \"{paste_response['anno']}\"!",
                             )
 
                     if text.lower() == 'паста':
@@ -170,10 +170,10 @@ if __name__ == '__main__':
 
                     if text.lower() == 'топ':
                         response = api('http://paster-web:8000/api/v1/paste/get/top/')
-                        mess = "Лучшие пасты:\n\nСсылка - рейтинг - кол-во оценок\n\n"
+                        mess = "Лучшие пасты:\n\nАннотация - рейтинг - кол-во оценок\n\n"
                         i = 1
                         for paste in response:
-                            mess += f"{i}. {paste['link']} - {paste['rating']}⭐️ - {paste['cnt']}🧮\n\n"
+                            mess += f"{i}. {paste['anno']} - {paste['rating']}⭐️ - {paste['cnt']}🧮\n{paste['link']}\n\n"
                             i += 1
                         vk.messages.send(
                             chat_id=chat_id, 
@@ -231,7 +231,7 @@ if __name__ == '__main__':
                             vk.messages.send(
                                 user_id=from_id, 
                                 random_id=get_random_id(), 
-                                message=f"Успешно оценено на {mark}"
+                                message=f"Успешно оценено на {mark}⭐️"
                             )
                         else:
                             vk.messages.send(
@@ -280,10 +280,10 @@ if __name__ == '__main__':
 
                     if text.lower() == 'топ':
                         response = api('http://paster-web:8000/api/v1/paste/get/top/')
-                        mess = "Лучшие пасты:\n\nСсылка - рейтинг - кол-во оценок\n\n"
+                        mess = "Лучшие пасты:\n\nАннотация - рейтинг - кол-во оценок\n\n"
                         i = 1
                         for paste in response:
-                            mess += f"{i}. {paste['link']} - {paste['rating']}⭐️ - {paste['cnt']}🧮\n\n"
+                            mess += f"{i}. {paste['anno']} - {paste['rating']}⭐️ - {paste['cnt']}🧮\n{paste['link']}\n\n"
                             i += 1
                         vk.messages.send(
                             user_id=from_id, 

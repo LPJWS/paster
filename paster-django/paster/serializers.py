@@ -129,6 +129,7 @@ class PasteSerializer(BaseImageSerializer):
     avg = serializers.ReadOnlyField()
     cnt = serializers.ReadOnlyField()
     rating = serializers.ReadOnlyField()
+    anno = serializers.ReadOnlyField()
     vk_id = serializers.IntegerField(write_only=True, required=False)
     mark = serializers.IntegerField(write_only=True, required=False)
     link = serializers.CharField(required=False)
