@@ -12,5 +12,5 @@ service = os.environ.get('VK_SERVICE')
 token = os.environ.get('VK_TOKEN')
 group_id = os.environ.get('VK_GROUP_ID')
 main_keyboard = get_main_keyboard()
-groups = ['108531402', '92157416']
+groups = ['108531402', '92157416', '157651636']
 groups_minus = [-int(i) for i in groups]

@@ -8,7 +8,7 @@ import random
 from paster.models import *
 
 VK_SERVICE = os.environ.get('VK_SERVICE')
-GROUPS = ['108531402', '92157416']
+GROUPS = ['108531402', '92157416', '157651636']
 
 def send_email(m: str, to: str, s: str):
     msg = MIMEMultipart()
