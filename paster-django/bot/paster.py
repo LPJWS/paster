@@ -136,7 +136,10 @@ if __name__ == '__main__':
                         if 'link' in response.keys():
                             group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
                             wall_id = response['link'].split('/')[3].split('-')[1].split('_')[1]
+                            rating = response['rating']
+                            cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
+                            mess = f'Данную пасту оценили {cnt} раз, рейтинг - {rating}⭐️'
                             mess=''
                             vk.messages.send(
                                 chat_id=chat_id, 
@@ -153,12 +156,16 @@ if __name__ == '__main__':
                         if 'link' in response.keys():
                             group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
                             wall_id = response['link'].split('/')[3].split('-')[1].split('_')[1]
+                            rating = response['rating']
+                            cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
+                            mess = f'Данную пасту оценили {cnt} раз, рейтинг - {rating}⭐️'
                             vk.messages.send(
                                 chat_id=chat_id, 
                                 random_id=get_random_id(),
                                 keyboard=paste_keyboard({'paste': response['id']}),
-                                attachment=attachment
+                                attachment=attachment,
+                                message=mess
                             )
                         continue
 
@@ -240,8 +247,10 @@ if __name__ == '__main__':
                         if 'link' in response.keys():
                             group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
                             wall_id = response['link'].split('/')[3].split('-')[1].split('_')[1]
+                            rating = response['rating']
+                            cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
-                            mess=''
+                            mess = f'Данную пасту оценили {cnt} раз, рейтинг - {rating}⭐️'
                             vk.messages.send(
                                 user_id=from_id, 
                                 random_id=get_random_id(), 
@@ -257,12 +266,16 @@ if __name__ == '__main__':
                         if 'link' in response.keys():
                             group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
                             wall_id = response['link'].split('/')[3].split('-')[1].split('_')[1]
+                            rating = response['rating']
+                            cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
+                            mess = f'Данную пасту оценили {cnt} раз, рейтинг - {rating}⭐️'
                             vk.messages.send(
                                 user_id=from_id, 
                                 random_id=get_random_id(),
                                 keyboard=paste_keyboard({'paste': response['id']}),
-                                attachment=attachment
+                                attachment=attachment,
+                                message=mess
                             )
                         continue
 
