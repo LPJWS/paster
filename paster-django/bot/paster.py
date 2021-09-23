@@ -164,10 +164,10 @@ if __name__ == '__main__':
 
                     if text.lower() == 'топ':
                         response = api('http://paster-web:8000/api/v1/paste/get/top/')
-                        mess = "Лучшие пасты:\n\nСсылка - средняя оценка - кол-во оценок\n\n"
+                        mess = "Лучшие пасты:\n\nСсылка - рейтинг - кол-во оценок\n\n"
                         i = 1
                         for paste in response:
-                            mess += f"{i}. {paste['link']} - {paste['avg']} - {paste['cnt']}\n\n"
+                            mess += f"{i}. {paste['link']} - {paste['rating']}⭐️ - {paste['cnt']}🧮\n\n"
                             i += 1
                         vk.messages.send(
                             chat_id=chat_id, 
@@ -182,7 +182,7 @@ if __name__ == '__main__':
                         mess = "Лучшие участники:\n\nУчастник - кол-во оценок - средняя оценка\n\n"
                         i = 1
                         for member in response:
-                            mess += f"{i}. [id{member['vk_id']}|{member['name']}] - {member['cnt']} - {member['avg']}\n\n"
+                            mess += f"{i}. [id{member['vk_id']}|{member['name']}] - {member['cnt']}🧮 - {member['avg']}⭐️\n\n"
                             i += 1
                         vk.messages.send(
                             chat_id=chat_id, 
@@ -268,10 +268,10 @@ if __name__ == '__main__':
 
                     if text.lower() == 'топ':
                         response = api('http://paster-web:8000/api/v1/paste/get/top/')
-                        mess = "Лучшие пасты:\n\nСсылка - средняя оценка - кол-во оценок\n\n"
+                        mess = "Лучшие пасты:\n\nСсылка - рейтинг - кол-во оценок\n\n"
                         i = 1
                         for paste in response:
-                            mess += f"{i}. {paste['link']} - {paste['avg']} - {paste['cnt']}\n\n"
+                            mess += f"{i}. {paste['link']} - {paste['rating']}⭐️ - {paste['cnt']}🧮\n\n"
                             i += 1
                         vk.messages.send(
                             user_id=from_id, 
@@ -287,7 +287,7 @@ if __name__ == '__main__':
                         mess = "Лучшие участники:\n\nУчастник - кол-во оценок - средняя оценка\n\n"
                         i = 1
                         for member in response:
-                            mess += f"{i}. [id{member['vk_id']}|{member['name']}] - {member['cnt']} - {member['avg']}\n\n"
+                            mess += f"{i}. [id{member['vk_id']}|{member['name']}] - {member['cnt']}🧮 - {member['avg']}⭐️\n\n"
                             i += 1
                         vk.messages.send(
                             user_id=from_id, 
