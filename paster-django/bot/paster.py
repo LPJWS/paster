@@ -131,7 +131,7 @@ if __name__ == '__main__':
                             )
 
                     if text.lower() == 'паста':
-                        response = api('http://paster-web:8000/api/v1/paste/get/unrelated/')
+                        response = api(f'http://paster-web:8000/api/v1/paste/get/unrelated/?vk_id={from_id}')
                         attachment = ''
                         if 'link' in response.keys():
                             group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
@@ -241,7 +241,7 @@ if __name__ == '__main__':
                             )
 
                     if text.lower() == 'паста':
-                        response = api('http://paster-web:8000/api/v1/paste/get/unrelated/')
+                        response = api(f'http://paster-web:8000/api/v1/paste/get/unrelated/?vk_id={from_id}')
                         attachment = ''
                         if 'link' in response.keys():
                             group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]

@@ -51,7 +51,7 @@ def accumulate():
         paste, created = Paste.objects.get_or_create(link=link, text=text)
         if created:
             paste.save()
-            break
+            return paste
 
 
 def get_text_by_id(link):

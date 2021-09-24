@@ -136,24 +136,45 @@ class PasteView(viewsets.ViewSet):
 
     @action(methods=['GET'], detail=False, url_path='get/unrelated', url_name='Get most unrelated paste', permission_classes=permission_classes)
     def get_unrelated(self, request, *args, **kwargs):
-        if random.random() > 0.7:
+        params = request.GET
+        if random.random() > 0.8:
             paster.utils.accumulate()
 
-        pastes = sorted(Paste.objects.all(), key=lambda t: t.cnt)
+        if 'vk_id' in params.keys():
+            vk_id = params['vk_id']
+            try:
+                member = Member.objects.get(vk_id=vk_id)
+            except Member.DoesNotExist:
+                member_serializer = MemberSerializer(data=params)
+                member_serializer.is_valid(raise_exception=True)
+                member = member_serializer.save()
 
-        flag = True
-        tmp_cnt = pastes[0].cnt
-        for paste in pastes[1:]:
-            if paste.cnt != tmp_cnt:
-                flag = False
-        if flag and tmp_cnt != 0:
-            paster.utils.accumulate()
-            pastes = sorted(Paste.objects.all(), key=lambda t: t.cnt)
-            return Response(self.serializer_class(instance=pastes[0]).data, status=status.HTTP_200_OK)
+            related = [x.paste.id for x in Mark.objects.filter(member=member)]
+            pastes = sorted(Paste.objects.all().exclude(id__in=related), key=lambda t: t.cnt)
+
+            if pastes:
+                min_cnt = pastes[0].cnt
+                pastes = [x for x in pastes if x.cnt == min_cnt]
+                return Response(self.serializer_class(instance=pastes[random.randint(0, len(pastes)-1)]).data, status=status.HTTP_200_OK)
+            else:
+                paste = paster.utils.accumulate()
+                return Response(self.serializer_class(instance=paste).data, status=status.HTTP_200_OK)
         else:
-            min_cnt = pastes[0].cnt
-            pastes = [x for x in pastes if x.cnt == min_cnt]
-            return Response(self.serializer_class(instance=pastes[random.randint(0, len(pastes)-1)]).data, status=status.HTTP_200_OK)
+            pastes = sorted(Paste.objects.all(), key=lambda t: t.cnt)
+            flag = True
+            tmp_cnt = pastes[0].cnt
+            for paste in pastes[1:]:
+                if paste.cnt != tmp_cnt:
+                    flag = False
+            if flag and tmp_cnt != 0:
+                paste = paster.utils.accumulate()
+                return Response(self.serializer_class(instance=paste).data, status=status.HTTP_200_OK)
+            else:
+                min_cnt = pastes[0].cnt
+                pastes = [x for x in pastes if x.cnt == min_cnt]
+                return Response(self.serializer_class(instance=pastes[random.randint(0, len(pastes)-1)]).data, status=status.HTTP_200_OK)
+
+
 
     @action(methods=['POST'], detail=False, url_path='relate', url_name='Relate paste', permission_classes=permission_classes)
     def relate(self, request, *args, **kwargs):
@@ -165,6 +186,7 @@ class PasteView(viewsets.ViewSet):
             return Response({'status': 'ok'})
         else:
             return Response({'status': 'already'})
+
 
     @action(methods=['POST'], detail=False, url_path='add', url_name='Add paste to base', permission_classes=permission_classes)
     def add_paste(self, request, *args, **kwargs):

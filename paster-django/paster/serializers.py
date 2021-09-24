@@ -146,7 +146,7 @@ class PasteSerializer(BaseImageSerializer):
     def relate(self, instance, validated_data):
         try:
             member = Member.objects.get(vk_id=validated_data.get('vk_id'))
-        except User.DoesNotExist:
+        except Member.DoesNotExist:
             member_serializer = MemberSerializer(data=validated_data)
             member_serializer.is_valid(raise_exception=True)
             member = member_serializer.save()
