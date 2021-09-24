@@ -126,7 +126,7 @@ class PasteView(viewsets.ViewSet):
 
     @action(methods=['GET'], detail=False, url_path='get/rand', url_name='Get rand paste', permission_classes=permission_classes)
     def get_rand(self, request, *args, **kwargs):
-        if random.random() > 0.7:
+        if random.random() > 0.8:
             paster.utils.accumulate()
         pastes = Paste.objects.all()
         cnt = len(pastes)
@@ -137,7 +137,7 @@ class PasteView(viewsets.ViewSet):
     @action(methods=['GET'], detail=False, url_path='get/unrelated', url_name='Get most unrelated paste', permission_classes=permission_classes)
     def get_unrelated(self, request, *args, **kwargs):
         params = request.GET
-        if random.random() > 0.8:
+        if random.random() > 0.95:
             paster.utils.accumulate()
 
         if 'vk_id' in params.keys():
