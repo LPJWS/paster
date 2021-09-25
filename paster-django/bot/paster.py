@@ -198,6 +198,15 @@ if __name__ == '__main__':
                         )
                         continue
 
+                    if text.lower() == 'начать':
+                        vk.messages.send(
+                            chat_id=chat_id, 
+                            random_id=get_random_id(),
+                            keyboard=config.main_keyboard,
+                            message='Чего хочешь, дорогой? Инфа если что есть на стене'
+                        )
+                        continue
+
                     pass
                 else:
                     if event.object['attachments'] \
@@ -308,7 +317,13 @@ if __name__ == '__main__':
                             keyboard=config.main_keyboard
                         )
                         continue
-                    pass
+                        
+                    vk.messages.send(
+                            user_id=from_id, 
+                            random_id=get_random_id(),
+                            keyboard=config.main_keyboard,
+                            message='Чего хочешь, дорогой? Инфа если что есть на стене'
+                        )
         except Exception as e:
             print(get_timestamp(), 'VK BOT ERROR!')
             traceback.print_exc()
