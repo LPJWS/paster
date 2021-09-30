@@ -154,6 +154,8 @@ class PasteSerializer(BaseImageSerializer):
         if created:
             mark.mark = validated_data.get('mark')
             mark.save()
+            instance.last_relate = datetime.now()
+            instance.save()
             return True
         return False
 

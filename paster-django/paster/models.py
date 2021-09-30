@@ -103,6 +103,7 @@ class Paste(models.Model):
     """
     link = models.CharField(max_length=150, null=True, blank=True, verbose_name='Ссылка на пасту')
     text = models.TextField(null=True, blank=True, verbose_name='Текст пасты')
+    last_relate = models.DateTimeField(default=timezone.now)
 
     @property
     def avg(self) -> float:
@@ -156,6 +157,7 @@ class Mark(models.Model):
     member = models.ForeignKey(Member, null=True, blank=True, on_delete=CASCADE)
     paste = models.ForeignKey(Paste, on_delete=CASCADE)
     mark = models.IntegerField(default=5, verbose_name='Оценка')
+    created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self) -> str:
         return f"{self.member.name} ({self.paste.anno}) ({self.mark})"

@@ -20,3 +20,12 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'configs.settings')
 app = Celery('apps')
 app.config_from_object(CeleryConfig)
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+
+app.conf.beat_schedule = {
+    "daily_post": {
+        "task": 'paster.tasks.daily_post',
+        "schedule": crontab(hour='23',
+                            minute=59,
+                            )
+    }
+}

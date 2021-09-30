@@ -9,6 +9,8 @@ from paster.models import *
 
 VK_SERVICE = os.environ.get('VK_SERVICE')
 GROUPS = ['108531402', '92157416', '157651636']
+VK_OAUTH = os.environ.get('VK_OAUTH')
+VK_GROUP_ID = os.environ.get('VK_GROUP_ID')
 
 
 def get_name_by_id(user_id):
@@ -62,3 +64,10 @@ def get_text_by_id(link):
     wall_id = link.split('/')[3].split('-')[1].split('_')[1]
     t = vk.wall.getById(posts=f'-{group_id}_{wall_id}')[0]['text']
     return t
+
+
+def wall_post(message='TEST', copyright=None):
+    vk_session = vk_api.VkApi(token=VK_OAUTH)
+    vk = vk_session.get_api()
+
+    vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, copyright=copyright)

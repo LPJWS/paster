@@ -17,6 +17,7 @@ import paster.utils
 
 import os
 import json
+from datetime import date
 
 
 class AuthView(viewsets.ViewSet):
@@ -219,3 +220,18 @@ class MemberView(viewsets.ViewSet):
     def get_top_members(self, request, *args, **kwargs):
         members = sorted(Member.objects.all(), key=lambda t: t.cnt, reverse=True)[:20]
         return Response(self.serializer_class(instance=members, many=True).data, status=status.HTTP_200_OK)
+
+
+class WallView(viewsets.ViewSet):
+    """
+    Работа со стеной
+    """
+    permission_classes = (AllowAny, )
+    serializer_class = MemberSerializer
+
+    @action(methods=['GET'], detail=False, url_path='test', url_name='Test wall', permission_classes=permission_classes)
+    def test_wall(self, request, *args, **kwargs):
+        best = sorted(Paste.objects.filter(last_relate__date=date.today()), key=lambda t: t.rating, reverse=True)[0]
+        mess = f'Лучшая паста за день:\n\n{best.text}'
+        paster.utils.wall_post(message=mess, copyright=best.link)
+        return Response(status=status.HTTP_200_OK)
