@@ -42,7 +42,7 @@ def daily_post():
     vk = vk_session.get_api()
     best = sorted(Paste.objects.filter(last_relate__date=date.today()), key=lambda t: t.rating, reverse=True)[0]
 
-    message = f'Лучшая паста за день:\n\n{best.text}'
+    message = f'Лучшая паста за день ({date.today().day}.{date.today().month}):\n\n{best.text}'
     copyright = best.link
 
     vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, copyright=copyright)
