@@ -137,14 +137,14 @@ class Paste(models.Model):
     @property
     def anno(self) -> str:
         result = self.text
-        result = re.sub(r"\s+|\n|\r|\s+|\#\w+", ' ', result)
+        result = re.sub(r"\s+|\n|\r|\s+|\#[a-zA-ZА-Яа-я_0-9]+", ' ', result)
         
         return ' '.join(result.strip().split()[:5]) + '...'
 
     @property
     def clear_text(self) -> str:
         result = self.text
-        result = re.sub(r"\s+|\n|\r|\s+|\#\w+", ' ', result)
+        result = re.sub(r"\s+|\n|\r|\s+|\#[a-zA-ZА-Яа-я_0-9]+", ' ', result)
         return result.strip()
 
     def __str__(self) -> str:
