@@ -31,8 +31,8 @@ services:
     command: bash -c "rm -rf celerybeat.pid && python manage.py collectstatic --no-input && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/site
-    ports:
-      - "8000:8000"
+    expose:
+      - 8000
     depends_on:
       - postgresql-paster
 
