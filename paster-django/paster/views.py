@@ -127,7 +127,7 @@ class PasteView(viewsets.ViewSet):
 
     @action(methods=['GET'], detail=False, url_path='get/rand', url_name='Get rand paste', permission_classes=permission_classes)
     def get_rand(self, request, *args, **kwargs):
-        if random.random() > 0.8:
+        if random.random() > 0.95:
             paster.utils.accumulate()
         pastes = Paste.objects.all()
         cnt = len(pastes)
