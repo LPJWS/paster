@@ -72,7 +72,6 @@ if __name__ == '__main__':
     while 1:
         try:
             for event in longpoll.listen():
-                print(event)
                 if event.type != VkBotEventType.MESSAGE_NEW:
                     continue
                 text = event.obj.text
