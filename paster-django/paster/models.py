@@ -141,6 +141,12 @@ class Paste(models.Model):
         
         return ' '.join(result.strip().split()[:5]) + '...'
 
+    @property
+    def clear_text(self) -> str:
+        result = self.text
+        result = re.sub(r"\s+|\n|\r|\s+|\#\w+", ' ', result)
+        return result.strip()
+
     def __str__(self) -> str:
         return f"{self.anno} ({self.link})"
 
