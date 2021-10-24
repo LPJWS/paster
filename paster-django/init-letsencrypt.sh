@@ -5,7 +5,7 @@ if ! [ -x "$(command -v docker-compose)" ]; then
   exit 1
 fi
 
-domains=(v801584.hosted-by-vdsina.ru www.v801584.hosted-by-vdsina.ru)
+domains=(lpjakewolfskin.ru www.lpjakewolfskin.ru)
 rsa_key_size=4096
 data_path="./data/certbot"
 email="" # Adding a valid address is strongly recommended
