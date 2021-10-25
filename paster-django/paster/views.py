@@ -216,6 +216,11 @@ class MemberView(viewsets.ViewSet):
         member = Member.objects.get(id=id)
         return Response(self.serializer_class(instance=member).data, status=status.HTTP_200_OK)
 
+    @action(methods=['GET'], detail=False, url_path='get_vk/(?P<id>\d+)', url_name='Get member by vk', permission_classes=permission_classes)
+    def get_vk_member(self, request, id, *args, **kwargs):
+        member = Member.objects.get(vk_id=id)
+        return Response(self.serializer_class(instance=member).data, status=status.HTTP_200_OK)
+
     @action(methods=['GET'], detail=False, url_path='get/top', url_name='Get top members', permission_classes=permission_classes)
     def get_top_members(self, request, *args, **kwargs):
         members = sorted(Member.objects.all(), key=lambda t: t.cnt, reverse=True)[:20]
