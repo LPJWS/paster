@@ -47,8 +47,6 @@ class BaseImageSerializer(serializers.ModelSerializer):
         return ret
 
 
-
-
 class AuthorizationSerializer(BaseImageSerializer):
     """ Сериализация авторизации """
 

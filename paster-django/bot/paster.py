@@ -1,3 +1,4 @@
+import re
 import requests
 import bs4
 from bs4 import BeautifulSoup
@@ -53,7 +54,14 @@ def paste_keyboard(data={}):
 
 def get_name_by_id(user_id):
     t = vk.users.get(user_ids=(user_id,))[0]
-    return t['first_name'] + ' ' + t['last_name'] 
+    return t['first_name'] + ' ' + t['last_name']
+
+
+def get_group_by_link(link):
+    if not re.match(r'https:\/\/vk\.com\/wall-\d+_\d+', link):
+        return None
+    else:
+        return link.split('/')[3].split('-')[1].split('_')[0]
 
 
 if __name__ == '__main__':
@@ -72,6 +80,7 @@ if __name__ == '__main__':
     while 1:
         try:
             for event in longpoll.listen():
+                # print(event)
                 if event.type != VkBotEventType.MESSAGE_NEW:
                     continue
                 text = event.obj.text
@@ -86,14 +95,25 @@ if __name__ == '__main__':
                     mess_id = event.object['conversation_message_id']
                     peer_id = event.object['peer_id']
 
-                    if event.object['attachments'] \
-                        and event.object['attachments'][0]['type'] == 'wall' \
+                    if event.object['attachments']:
+                        if event.object['attachments'][0]['type'] == 'wall' \
                         and event.object['attachments'][0]['wall']['from_id'] in config.groups_minus:
                             group_id = event.object['attachments'][0]['wall']['from_id']
                             wall_id = event.object['attachments'][0]['wall']['id']
                             link = f'https://vk.com/wall{group_id}_{wall_id}'
-                            attachment = f'wall{group_id}_{wall_id}'
+                            # attachment = f'wall{group_id}_{wall_id}'
                             response = api('http://paster-web:8000/api/v1/paste/add/', method='post', data={'link': link})
+                            vk.messages.send(
+                                chat_id=chat_id, 
+                                random_id=get_random_id(), 
+                                message='Обнаружена паста\nОцените пожалуйста',
+                                forward=json.dumps({'peer_id': peer_id, 'is_reply': True, 'conversation_message_ids': [mess_id]}),
+                                keyboard=paste_keyboard({'paste': response['id']}),
+                            )
+                            continue
+                        elif event.object['attachments'][0]['type'] == 'link' \
+                        and get_group_by_link(event.object['attachments'][0]['link']['url']) in config.groups:
+                            response = api('http://paster-web:8000/api/v1/paste/add/', method='post', data={'link': event.object['attachments'][0]['link']['url']})
                             vk.messages.send(
                                 chat_id=chat_id, 
                                 random_id=get_random_id(), 
