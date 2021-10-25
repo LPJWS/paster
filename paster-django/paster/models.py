@@ -147,6 +147,14 @@ class Paste(models.Model):
         result = re.sub(r"\s+|\n|\r|\s+|\#[a-zA-ZА-Яа-я_0-9]+", ' ', result)
         return result.strip()
 
+    @property
+    def group(self) -> str:
+        return self.link.split('/')[3].split('-')[1].split('_')[0]
+
+    @property
+    def post(self) -> str:
+        return self.link.split('/')[3].split('-')[1].split('_')[1]
+
     def __str__(self) -> str:
         return f"{self.anno} ({self.link})"
 
