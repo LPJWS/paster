@@ -179,3 +179,4 @@ class Mark(models.Model):
     class Meta:
         verbose_name = 'Оценка пасты'
         verbose_name_plural = 'Оценки паст'
+        ordering = ('-created_at',)

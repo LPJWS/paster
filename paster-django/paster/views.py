@@ -125,6 +125,11 @@ class PasteView(viewsets.ViewSet):
         paste = Paste.objects.get(id=id)
         return Response(self.serializer_class(instance=paste).data, status=status.HTTP_200_OK)
 
+    # @action(methods=['GET'], detail=False, url_path='get_marks/(?P<id>\d+)', url_name='Get paste marks', permission_classes=permission_classes)
+    # def get_paste_marks(self, request, id, *args, **kwargs):
+    #     paste = Paste.objects.get(id=id)
+    #     return Response(MarkPasteSerializer(instance=paste).data, status=status.HTTP_200_OK)
+
     @action(methods=['GET'], detail=False, url_path='get/rand', url_name='Get rand paste', permission_classes=permission_classes)
     def get_rand(self, request, *args, **kwargs):
         if random.random() > 0.95:
@@ -201,7 +206,7 @@ class PasteView(viewsets.ViewSet):
     @action(methods=['GET'], detail=False, url_path='get/top', url_name='Get top pastes', permission_classes=permission_classes)
     def get_top(self, request, *args, **kwargs):
         pastes = sorted(Paste.objects.all(), key=lambda t: t.rating, reverse=True)[:20]
-        return Response(self.serializer_class(instance=pastes, many=True).data, status=status.HTTP_200_OK)
+        return Response(PasteListSerializer(instance=pastes, many=True).data, status=status.HTTP_200_OK)
 
 
 class MemberView(viewsets.ViewSet):
@@ -225,6 +230,11 @@ class MemberView(viewsets.ViewSet):
     def get_top_members(self, request, *args, **kwargs):
         members = sorted(Member.objects.all(), key=lambda t: t.cnt, reverse=True)[:20]
         return Response(self.serializer_class(instance=members, many=True).data, status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=False, url_path='get_marks/(?P<vk_id>\d+)', url_name='Get member\'s marks', permission_classes=permission_classes)
+    def get_member_marks(self, request, vk_id, *args, **kwargs):
+        member = Member.objects.get(vk_id=vk_id)
+        return Response(MarkMemberSerializer(instance=member).data, status=status.HTTP_200_OK)
 
 
 class WallView(viewsets.ViewSet):

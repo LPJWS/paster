@@ -165,12 +165,38 @@ class PasteSerializer(BaseImageSerializer):
         fields = '__all__'
 
 
+class PasteListSerializer(BaseImageSerializer):
+    avg = serializers.ReadOnlyField()
+    cnt = serializers.ReadOnlyField()
+    rating = serializers.ReadOnlyField()
+    anno = serializers.ReadOnlyField()
+    group = serializers.ReadOnlyField()
+    post = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Paste
+        exclude = ('text',)
+
+
+class MarkSerializer(BaseImageSerializer):
+    paste = PasteListSerializer()
+
+    class Meta:
+        model = Mark
+        fields = '__all__'
+
+
 class MemberSerializer(BaseImageSerializer):
     """
     Сериализатор для детального отображения пользователя
     """
     avg = serializers.ReadOnlyField()
     cnt = serializers.ReadOnlyField()
+    marks = serializers.SerializerMethodField()
+
+    def get_marks(self, object):
+        m_marks = Mark.objects.filter(member=object)
+        return MarkSerializer(instance=m_marks, many=True, context=self.context).data
 
     def create(self, validated_data):
         member, created = Member.objects.get_or_create(
