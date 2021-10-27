@@ -229,12 +229,7 @@ class MemberView(viewsets.ViewSet):
     @action(methods=['GET'], detail=False, url_path='get/top', url_name='Get top members', permission_classes=permission_classes)
     def get_top_members(self, request, *args, **kwargs):
         members = sorted(Member.objects.all(), key=lambda t: t.cnt, reverse=True)[:20]
-        return Response(self.serializer_class(instance=members, many=True).data, status=status.HTTP_200_OK)
-
-    @action(methods=['GET'], detail=False, url_path='get_marks/(?P<vk_id>\d+)', url_name='Get member\'s marks', permission_classes=permission_classes)
-    def get_member_marks(self, request, vk_id, *args, **kwargs):
-        member = Member.objects.get(vk_id=vk_id)
-        return Response(MarkMemberSerializer(instance=member).data, status=status.HTTP_200_OK)
+        return Response(MemberListSerializer(instance=members, many=True).data, status=status.HTTP_200_OK)
 
 
 class WallView(viewsets.ViewSet):

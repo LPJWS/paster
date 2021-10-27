@@ -211,3 +211,25 @@ class MemberSerializer(BaseImageSerializer):
     class Meta:
         model = Member
         fields = '__all__'
+
+
+class MemberListSerializer(BaseImageSerializer):
+    """
+    Сериализатор для листингового отображения пользователя
+    """
+    avg = serializers.ReadOnlyField()
+    cnt = serializers.ReadOnlyField()
+
+    def create(self, validated_data):
+        member, created = Member.objects.get_or_create(
+            vk_id=validated_data.get('vk_id')
+        )
+        if created:
+            name = paster.utils.get_name_by_id(validated_data.get('vk_id'))
+            member.name = name
+            member.save()
+        return member
+
+    class Meta:
+        model = Member
+        fields = '__all__'
