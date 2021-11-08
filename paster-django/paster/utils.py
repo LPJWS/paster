@@ -74,9 +74,10 @@ def get_pic_by_id(link):
     group_id = link.split('/')[3].split('-')[1].split('_')[0]
     wall_id = link.split('/')[3].split('-')[1].split('_')[1]
     att = vk.wall.getById(posts=f'-{group_id}_{wall_id}')[0].get('attachments')
-    if att and att[0] and att[0].get('photo'):
+    if att:
         for e in att:
-            res += f"photo{e.get('photo').get('owner_id')}_{e.get('photo').get('id')},"
+            if e.get('type') == 'photo':
+                res += f"photo{e.get('photo').get('owner_id')}_{e.get('photo').get('id')},"
     return res
 
 
