@@ -73,8 +73,10 @@ def get_pic_by_id(link):
     res = ''
     group_id = link.split('/')[3].split('-')[1].split('_')[0]
     wall_id = link.split('/')[3].split('-')[1].split('_')[1]
-    for e in vk.wall.getById(posts=f'-{group_id}_{wall_id}')[0].get('attachments'):
-        res += f"photo{e.get('photo').get('owner_id')}_{e.get('photo').get('id')},"
+    att = vk.wall.getById(posts=f'-{group_id}_{wall_id}')[0].get('attachments')
+    if att:
+        for e in att:
+            res += f"photo{e.get('photo').get('owner_id')}_{e.get('photo').get('id')},"
     return res
 
 
@@ -84,8 +86,11 @@ def get_pic_link_by_id(link):
 
     group_id = link.split('/')[3].split('-')[1].split('_')[0]
     wall_id = link.split('/')[3].split('-')[1].split('_')[1]
-    res = vk.wall.getById(posts=f'-{group_id}_{wall_id}')[0].get('attachments')[0].get('photo').get('sizes')[-1].get('url')
-    return res
+    att = vk.wall.getById(posts=f'-{group_id}_{wall_id}')[0].get('attachments')
+    if att and att[0] and att[0].get('photo'):
+        return vk.wall.getById(posts=f'-{group_id}_{wall_id}')[0].get('attachments')[0].get('photo').get('sizes')[-1].get('url')
+    else:
+        return None
 
 
 def wall_post(message='TEST', copyright=None):
