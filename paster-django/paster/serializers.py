@@ -134,6 +134,14 @@ class PasteSerializer(BaseImageSerializer):
     vk_id = serializers.IntegerField(write_only=True, required=False)
     mark = serializers.IntegerField(write_only=True, required=False)
     link = serializers.CharField(required=False)
+    pic = serializers.SerializerMethodField()
+    pic_link = serializers.SerializerMethodField()
+
+    def get_pic(self, object):
+        return paster.utils.get_pic_by_id(object.link)
+
+    def get_pic_link(self, object):
+        return paster.utils.get_pic_link_by_id(object.link)
 
     def create(self, validated_data):
         paste, created = Paste.objects.get_or_create(

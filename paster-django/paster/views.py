@@ -241,7 +241,5 @@ class WallView(viewsets.ViewSet):
 
     @action(methods=['GET'], detail=False, url_path='test', url_name='Test wall', permission_classes=permission_classes)
     def test_wall(self, request, *args, **kwargs):
-        best = sorted(Paste.objects.filter(last_relate__date=date.today()), key=lambda t: t.rating, reverse=True)[0]
-        mess = f'Лучшая паста за день:\n\n{best.text}'
-        paster.utils.wall_post(message=mess, copyright=best.link)
+        daily_post.delay()
         return Response(status=status.HTTP_200_OK)

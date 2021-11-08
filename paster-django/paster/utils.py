@@ -66,6 +66,28 @@ def get_text_by_id(link):
     return t
 
 
+def get_pic_by_id(link):
+    vk_session = vk_api.VkApi(token=VK_SERVICE)
+    vk = vk_session.get_api()
+
+    res = ''
+    group_id = link.split('/')[3].split('-')[1].split('_')[0]
+    wall_id = link.split('/')[3].split('-')[1].split('_')[1]
+    for e in vk.wall.getById(posts=f'-{group_id}_{wall_id}')[0].get('attachments'):
+        res += f"photo{e.get('photo').get('owner_id')}_{e.get('photo').get('id')},"
+    return res
+
+
+def get_pic_link_by_id(link):
+    vk_session = vk_api.VkApi(token=VK_SERVICE)
+    vk = vk_session.get_api()
+
+    group_id = link.split('/')[3].split('-')[1].split('_')[0]
+    wall_id = link.split('/')[3].split('-')[1].split('_')[1]
+    res = vk.wall.getById(posts=f'-{group_id}_{wall_id}')[0].get('attachments')[0].get('photo').get('sizes')[-1].get('url')
+    return res
+
+
 def wall_post(message='TEST', copyright=None):
     vk_session = vk_api.VkApi(token=VK_OAUTH)
     vk = vk_session.get_api()
