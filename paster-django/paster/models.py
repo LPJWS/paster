@@ -144,7 +144,7 @@ class Paste(models.Model):
     @property
     def clear_text(self) -> str:
         result = self.text
-        result = re.sub(r"\s+|\n|\r|\s+|\#[a-zA-ZА-Яа-я_0-9]+", ' ', result)
+        result = re.sub(r"\s+|\s+|\#[a-zA-ZА-Яа-я_0-9]+", ' ', result)
         return result.strip()
 
     @property
