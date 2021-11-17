@@ -104,6 +104,7 @@ class Paste(models.Model):
     link = models.CharField(max_length=150, null=True, blank=True, verbose_name='Ссылка на пасту')
     text = models.TextField(null=True, blank=True, verbose_name='Текст пасты')
     last_relate = models.DateTimeField(default=timezone.now)
+    sender = models.ForeignKey(Member, on_delete=SET_NULL, null=True, blank=True, verbose_name='Отправитель')
 
     @property
     def avg(self) -> float:

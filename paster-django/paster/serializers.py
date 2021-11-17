@@ -120,88 +120,6 @@ class UserUpdateSerializer(BaseImageSerializer):
         fields = ['username', 'name', 'photo', 'old_password', 'new_password']
 
 
-class PasteSerializer(BaseImageSerializer):
-    """
-    Сериализатор для детального отображения пользователя
-    """
-    avg = serializers.ReadOnlyField()
-    cnt = serializers.ReadOnlyField()
-    rating = serializers.ReadOnlyField()
-    anno = serializers.ReadOnlyField()
-    clear_text = serializers.ReadOnlyField()
-    group = serializers.ReadOnlyField()
-    post = serializers.ReadOnlyField()
-    vk_id = serializers.IntegerField(write_only=True, required=False)
-    mark = serializers.IntegerField(write_only=True, required=False)
-    link = serializers.CharField(required=False)
-    pic = serializers.SerializerMethodField()
-    pic_link = serializers.SerializerMethodField()
-    related = serializers.SerializerMethodField()
-
-    def get_pic(self, object):
-        return paster.utils.get_pic_by_id(object.link)
-
-    def get_pic_link(self, object):
-        return paster.utils.get_pic_link_by_id(object.link)
-
-    def get_related(self, object):
-        try:
-            Mark.objects.get(paste=object, member=self.context.get('member'))
-            return True
-        except Mark.DoesNotExist:
-            return False
-
-    def create(self, validated_data):
-        paste, created = Paste.objects.get_or_create(
-            link=validated_data.get('link'), 
-            text=paster.utils.get_text_by_id(validated_data.get('link'))
-        )
-        if created:
-            paste.save()
-        return paste
-
-    def relate(self, instance, validated_data):
-        try:
-            member = Member.objects.get(vk_id=validated_data.get('vk_id'))
-        except Member.DoesNotExist:
-            member_serializer = MemberSerializer(data=validated_data)
-            member_serializer.is_valid(raise_exception=True)
-            member = member_serializer.save()
-        mark, created = Mark.objects.get_or_create(member=member, paste=instance)
-        if created:
-            mark.mark = validated_data.get('mark')
-            mark.save()
-            instance.last_relate = datetime.now()
-            instance.save()
-            return True
-        return False
-
-    class Meta:
-        model = Paste
-        fields = '__all__'
-
-
-class PasteListSerializer(BaseImageSerializer):
-    avg = serializers.ReadOnlyField()
-    cnt = serializers.ReadOnlyField()
-    rating = serializers.ReadOnlyField()
-    anno = serializers.ReadOnlyField()
-    group = serializers.ReadOnlyField()
-    post = serializers.ReadOnlyField()
-
-    class Meta:
-        model = Paste
-        exclude = ('text',)
-
-
-class MarkSerializer(BaseImageSerializer):
-    paste = PasteListSerializer()
-
-    class Meta:
-        model = Mark
-        fields = '__all__'
-
-
 class MemberSerializer(BaseImageSerializer):
     """
     Сериализатор для детального отображения пользователя
@@ -248,4 +166,93 @@ class MemberListSerializer(BaseImageSerializer):
 
     class Meta:
         model = Member
+        fields = '__all__'
+
+
+class PasteSerializer(BaseImageSerializer):
+    """
+    Сериализатор для детального отображения пользователя
+    """
+    avg = serializers.ReadOnlyField()
+    cnt = serializers.ReadOnlyField()
+    rating = serializers.ReadOnlyField()
+    anno = serializers.ReadOnlyField()
+    clear_text = serializers.ReadOnlyField()
+    group = serializers.ReadOnlyField()
+    post = serializers.ReadOnlyField()
+    vk_id = serializers.IntegerField(write_only=True, required=False)
+    mark = serializers.IntegerField(write_only=True, required=False)
+    link = serializers.CharField(required=False)
+    pic = serializers.SerializerMethodField()
+    pic_link = serializers.SerializerMethodField()
+    related = serializers.SerializerMethodField()
+    sender = MemberListSerializer()
+
+    def get_pic(self, object):
+        return paster.utils.get_pic_by_id(object.link)
+
+    def get_pic_link(self, object):
+        return paster.utils.get_pic_link_by_id(object.link)
+
+    def get_related(self, object):
+        try:
+            Mark.objects.get(paste=object, member=self.context.get('member'))
+            return True
+        except Mark.DoesNotExist:
+            return False
+
+    def create(self, validated_data):
+        text = paster.utils.get_text_by_id(validated_data.get('link'))
+        try:
+            paste = Paste.objects.get(link=validated_data.get('link'), text=text)
+        except Paste.DoesNotExist:
+            try:
+                member = Member.objects.get(vk_id=validated_data.get('vk_id'))
+            except Member.DoesNotExist:
+                member_serializer = MemberSerializer(data=validated_data)
+                member_serializer.is_valid(raise_exception=True)
+                member = member_serializer.save()
+            paste = Paste.objects.create(link=validated_data.get('link'), text=text, sender=member)
+            paste.save()
+        return paste
+
+    def relate(self, instance, validated_data):
+        try:
+            member = Member.objects.get(vk_id=validated_data.get('vk_id'))
+        except Member.DoesNotExist:
+            member_serializer = MemberSerializer(data=validated_data)
+            member_serializer.is_valid(raise_exception=True)
+            member = member_serializer.save()
+        mark, created = Mark.objects.get_or_create(member=member, paste=instance)
+        if created:
+            mark.mark = validated_data.get('mark')
+            mark.save()
+            instance.last_relate = datetime.now()
+            instance.save()
+            return True
+        return False
+
+    class Meta:
+        model = Paste
+        fields = '__all__'
+
+
+class PasteListSerializer(BaseImageSerializer):
+    avg = serializers.ReadOnlyField()
+    cnt = serializers.ReadOnlyField()
+    rating = serializers.ReadOnlyField()
+    anno = serializers.ReadOnlyField()
+    group = serializers.ReadOnlyField()
+    post = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Paste
+        exclude = ('text',)
+
+
+class MarkSerializer(BaseImageSerializer):
+    paste = PasteListSerializer()
+
+    class Meta:
+        model = Mark
         fields = '__all__'

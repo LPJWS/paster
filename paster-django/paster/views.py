@@ -142,6 +142,8 @@ class PasteView(viewsets.ViewSet):
                 member_serializer = MemberSerializer(data=params)
                 member_serializer.is_valid(raise_exception=True)
                 member = member_serializer.save()
+        else:
+            raise ValidationError({'info': 'vk_id expected'})
 
         if random.random() > 0.95:
             paster.utils.accumulate()

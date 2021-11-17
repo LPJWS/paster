@@ -10,7 +10,7 @@ from email.mime.text import MIMEText
 import os
 
 from paster.models import User, Paste
-from paster.serializers import *
+from paster.serializers import PasteSerializer
 
 from datetime import datetime, timedelta, date
 import vk_api
@@ -45,7 +45,10 @@ def daily_post():
     best = sorted(Paste.objects.filter(last_relate__date=date.today()), key=lambda t: t.rating, reverse=True)[0]
     serializer = PasteSerializer(instance=best).data
 
-    message = f'Лучшая паста за день ({date.today().day}.{date.today().month}):\n\n{best.clear_text}'
+    message = f'Лучшая паста за день ({date.today().day}.{date.today().month}):'
+    if best.sender:
+        message += f'\nПасту прислал [id{best.sender.vk_id}|{best.sender.name}]'
+    message += f'\n\n{best.clear_text}'
     copyright = best.link
     attach = serializer.get('pic')
 

@@ -159,6 +159,8 @@ if __name__ == '__main__':
                             cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
                             mess = f'Данную пасту оценили {cnt} раз, рейтинг - {rating}⭐️'
+                            if response['sender']:
+                                mess += f'\nПасту прислал [id{response["sender"]["id"]}|{response["sender"]["name"]}]'
                             vk.messages.send(
                                 chat_id=chat_id, 
                                 random_id=get_random_id(), 
@@ -169,7 +171,7 @@ if __name__ == '__main__':
                         continue
 
                     if text.lower() == 'случайная паста':
-                        response = api('http://paster-web:8000/api/v1/paste/get/rand/')
+                        response = api(f'http://paster-web:8000/api/v1/paste/get/rand/?vk_id={from_id}')
                         attachment = ''
                         if 'link' in response.keys():
                             group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
@@ -178,6 +180,8 @@ if __name__ == '__main__':
                             cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
                             mess = f'Данную пасту оценили {cnt} раз, рейтинг - {rating}⭐️'
+                            if response['sender']:
+                                mess += f'\nПасту прислал [id{response["sender"]["id"]}|{response["sender"]["name"]}]'
                             vk.messages.send(
                                 chat_id=chat_id, 
                                 random_id=get_random_id(),
@@ -278,6 +282,8 @@ if __name__ == '__main__':
                             cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
                             mess = f'Данную пасту оценили {cnt} раз, рейтинг - {rating}⭐️'
+                            if response['sender']:
+                                mess += f'\nПасту прислал [id{response["sender"]["id"]}|{response["sender"]["name"]}]'
                             vk.messages.send(
                                 user_id=from_id, 
                                 random_id=get_random_id(), 
@@ -288,7 +294,7 @@ if __name__ == '__main__':
                         continue
 
                     if text.lower() == 'случайная паста':
-                        response = api('http://paster-web:8000/api/v1/paste/get/rand/')
+                        response = api(f'http://paster-web:8000/api/v1/paste/get/rand/?vk_id={from_id}')
                         attachment = ''
                         if 'link' in response.keys():
                             group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
@@ -297,6 +303,8 @@ if __name__ == '__main__':
                             cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
                             mess = f'Данную пасту оценили {cnt} раз, рейтинг - {rating}⭐️'
+                            if response['sender']:
+                                mess += f'\nПасту прислал [id{response["sender"]["id"]}|{response["sender"]["name"]}]'
                             vk.messages.send(
                                 user_id=from_id, 
                                 random_id=get_random_id(),
