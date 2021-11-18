@@ -102,7 +102,7 @@ if __name__ == '__main__':
                             wall_id = event.object['attachments'][0]['wall']['id']
                             link = f'https://vk.com/wall{group_id}_{wall_id}'
                             # attachment = f'wall{group_id}_{wall_id}'
-                            response = api('http://paster-web:8000/api/v1/paste/add/', method='post', data={'link': link})
+                            response = api('http://paster-web:8000/api/v1/paste/add/', method='post', data={'link': link, 'vk_id': from_id})
                             vk.messages.send(
                                 chat_id=chat_id, 
                                 random_id=get_random_id(), 
@@ -113,7 +113,7 @@ if __name__ == '__main__':
                             continue
                         elif event.object['attachments'][0]['type'] == 'link' \
                         and get_group_by_link(event.object['attachments'][0]['link']['url']) in config.groups:
-                            response = api('http://paster-web:8000/api/v1/paste/add/', method='post', data={'link': event.object['attachments'][0]['link']['url']})
+                            response = api('http://paster-web:8000/api/v1/paste/add/', method='post', data={'link': event.object['attachments'][0]['link']['url'], 'vk_id': from_id})
                             vk.messages.send(
                                 chat_id=chat_id, 
                                 random_id=get_random_id(), 
@@ -238,7 +238,7 @@ if __name__ == '__main__':
                             group_id = event.object['attachments'][0]['wall']['from_id']
                             wall_id = event.object['attachments'][0]['wall']['id']
                             link = f'https://vk.com/wall{group_id}_{wall_id}'
-                            response = api('http://paster-web:8000/api/v1/paste/add/', method='post', data={'link': link})
+                            response = api('http://paster-web:8000/api/v1/paste/add/', method='post', data={'link': link, 'vk_id': from_id})
                             vk.messages.send(
                                 user_id=from_id, 
                                 random_id=get_random_id(), 
