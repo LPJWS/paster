@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import re
 from django.utils import timezone
 from email.policy import default
@@ -122,6 +122,22 @@ class Paste(models.Model):
     def rating(self) -> float:
         marks = Mark.objects.filter(paste=self)
         marks = Mark.objects.filter(paste=self).aggregate(sum=Sum('mark'), cnt=Count('id'))
+        if marks['cnt'] == 0:
+            return 0
+        
+        sum_rating = marks['sum']
+        n = marks['cnt']
+        votes_range = [1, 5]
+        z = 1.64485
+        v_min = min(votes_range)
+        v_width = float(max(votes_range) - v_min)
+        phat = (sum_rating - n * v_min) / v_width / float(n)
+        rating = (phat+z*z/(2*n)-z*sqrt((phat*(1-phat)+z*z/(4*n))/n))/(1+z*z/n)
+        return round(rating * v_width + v_min, 2)
+
+    @property
+    def daily_rating(self) -> float:
+        marks = Mark.objects.filter(paste=self, created_at__date=date.today()).aggregate(sum=Sum('mark'), cnt=Count('id'))
         if marks['cnt'] == 0:
             return 0
         

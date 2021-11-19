@@ -42,7 +42,7 @@ def daily_post():
     vk_session = vk_api.VkApi(token=VK_OAUTH)
     vk = vk_session.get_api()
     
-    best = sorted(Paste.objects.filter(last_relate__date=date.today()), key=lambda t: t.rating, reverse=True)[0]
+    best = sorted(Paste.objects.all(), key=lambda t: t.daily_rating, reverse=True)[0]
     serializer = PasteSerializer(instance=best).data
 
     message = f'Лучшая паста за день ({date.today().day}.{date.today().month}):'
