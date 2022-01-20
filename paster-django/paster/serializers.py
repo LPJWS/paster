@@ -193,7 +193,8 @@ class PasteSerializer(BaseImageSerializer):
         return paster.utils.get_rand_pic(object.link)
 
     def get_pic_link(self, object):
-        return paster.utils.get_pic_link_by_id(object.link)
+        # return paster.utils.get_pic_link_by_id(object.link)
+        return paster.utils.get_rand_pic_link(object.link)
 
     def get_related(self, object):
         try:

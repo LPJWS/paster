@@ -81,6 +81,20 @@ def get_rand_pic(link):
     return res
 
 
+def get_rand_pic_link(link):
+    vk_session = vk_api.VkApi(token=VK_SERVICE)
+    vk = vk_session.get_api()
+
+    random.seed(link)
+
+    max_num = vk.photos.get(owner_id=-109290951, album_id='wall', count=0)['count']
+    num = random.randint(1, max_num)
+    res = vk.photos.get(owner_id=str(-109290951), album_id='wall', count=1, offset=num)['items'][0].get('sizes')[-1].get('url')
+    
+    random.seed()
+    return res
+
+
 def get_pic_by_id(link):
     vk_session = vk_api.VkApi(token=VK_SERVICE)
     vk = vk_session.get_api()
