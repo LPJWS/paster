@@ -14,6 +14,8 @@ from paster.serializers import PasteSerializer
 
 from datetime import datetime, timedelta, date
 import vk_api
+from django.db.models import Q
+from django.utils import timezone
 
 
 @app.task()
@@ -45,7 +47,7 @@ def daily_post():
     best = sorted(Paste.objects.all(), key=lambda t: t.daily_rating, reverse=True)[0]
     serializer = PasteSerializer(instance=best).data
 
-    message = f'Лучшая паста за день ({date.today().day}.{date.today().month}):'
+    message = f'#пастер_топдня\nЛучшая паста за день ({date.today().day}.{date.today().month}):'
     if best.sender:
         message += f'\nПасту прислал [id{best.sender.vk_id}|{best.sender.name}]'
     message += f'\n\n{best.clear_text}'
@@ -53,3 +55,31 @@ def daily_post():
     attach = serializer.get('pic')
 
     vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, copyright=copyright, attachment=attach)
+
+
+@app.task()
+def regular_post():
+    VK_OAUTH = os.environ.get('VK_OAUTH')
+    VK_GROUP_ID = os.environ.get('VK_GROUP_ID')
+    vk_session = vk_api.VkApi(token=VK_OAUTH)
+    vk = vk_session.get_api()
+    
+    # time_threshold = datetime.now(timezone.now()) - timedelta(days=14)
+    best = Paste.objects.filter(Q(last_publicate__isnull=True))
+    if best:
+        best = best[0]
+    else:
+        best = sorted(Paste.objects.filter(Q(last_publicate__isnull=False)), key=lambda t: t.last_publicate)[0]
+    best.last_publicate = timezone.now()
+    best.save()
+    serializer = PasteSerializer(instance=best).data
+
+    message = f'#пастер_рандом\nОценить пасту: https://vk.com/app7983387#{best.id}'
+    if best.sender:
+        message += f'\nПасту прислал [id{best.sender.vk_id}|{best.sender.name}]'
+    message += f'\n\n{best.clear_text}'
+    copyright = best.link
+    attach = serializer.get('pic')
+
+    vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, copyright=copyright, attachment=attach)
+

@@ -27,5 +27,47 @@ app.conf.beat_schedule = {
         "schedule": crontab(hour='23',
                             minute=59,
                             )
-    }
+    },
+    'regular_post_3': {
+        'task': 'paster.tasks.regular_post',
+        'schedule': crontab(hour='3',
+                            minute=0,
+                            )
+    },
+    'regular_post_6': {
+        'task': 'paster.tasks.regular_post',
+        'schedule': crontab(hour='6',
+                            minute=0,
+                            )
+    },
+    'regular_post_9': {
+        'task': 'paster.tasks.regular_post',
+        'schedule': crontab(hour='9',
+                            minute=0,
+                            )
+    },
+    'regular_post_12': {
+        'task': 'paster.tasks.regular_post',
+        'schedule': crontab(hour='12',
+                            minute=0,
+                            )
+    },
+    'regular_post_15': {
+        'task': 'paster.tasks.regular_post',
+        'schedule': crontab(hour='15',
+                            minute=0,
+                            )
+    },
+    'regular_post_18': {
+        'task': 'paster.tasks.regular_post',
+        'schedule': crontab(hour='18',
+                            minute=0,
+                            )
+    },
+    'regular_post_21': {
+        'task': 'paster.tasks.regular_post',
+        'schedule': crontab(hour='21',
+                            minute=0,
+                            )
+    },
 }

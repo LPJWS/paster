@@ -105,6 +105,7 @@ class Paste(models.Model):
     text = models.TextField(null=True, blank=True, verbose_name='Текст пасты')
     last_relate = models.DateTimeField(default=timezone.now)
     sender = models.ForeignKey(Member, on_delete=SET_NULL, null=True, blank=True, verbose_name='Отправитель')
+    last_publicate = models.DateTimeField(null=True, blank=True, verbose_name="Дата последней публикации")
 
     @property
     def avg(self) -> float:

@@ -254,5 +254,6 @@ class WallView(viewsets.ViewSet):
 
     @action(methods=['GET'], detail=False, url_path='test', url_name='Test wall', permission_classes=permission_classes)
     def test_wall(self, request, *args, **kwargs):
-        daily_post.delay()
+        # daily_post.delay()
+        regular_post.delay()
         return Response(status=status.HTTP_200_OK)
