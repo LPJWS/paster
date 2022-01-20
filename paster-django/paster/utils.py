@@ -66,6 +66,21 @@ def get_text_by_id(link):
     return t
 
 
+def get_rand_pic(link):
+    vk_session = vk_api.VkApi(token=VK_SERVICE)
+    vk = vk_session.get_api()
+
+    random.seed(link)
+
+    max_num = vk.photos.get(owner_id=-109290951, album_id='wall', count=0)['count']
+    num = random.randint(1, max_num)
+    res = ','.join(['photo-' + str(109290951) + '_' + str(
+        vk.photos.get(owner_id=str(-109290951), album_id='wall', count=1, offset=num)['items'][0]['id'])])
+    
+    random.seed()
+    return res
+
+
 def get_pic_by_id(link):
     vk_session = vk_api.VkApi(token=VK_SERVICE)
     vk = vk_session.get_api()

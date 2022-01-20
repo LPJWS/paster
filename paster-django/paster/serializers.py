@@ -189,7 +189,8 @@ class PasteSerializer(BaseImageSerializer):
     sender = MemberListSerializer(read_only=True)
 
     def get_pic(self, object):
-        return paster.utils.get_pic_by_id(object.link)
+        # return paster.utils.get_pic_by_id(object.link)
+        return paster.utils.get_rand_pic(object.link)
 
     def get_pic_link(self, object):
         return paster.utils.get_pic_link_by_id(object.link)
