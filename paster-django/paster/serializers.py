@@ -169,6 +169,16 @@ class MemberListSerializer(BaseImageSerializer):
         fields = '__all__'
 
 
+class PasteTagSerializer(BaseImageSerializer):
+    """
+    Сериализатор для тегов паст
+    """
+
+    class Meta:
+        model = PasteTag
+        fields = '__all__'
+
+
 class PasteSerializer(BaseImageSerializer):
     """
     Сериализатор для детального отображения пользователя
@@ -187,6 +197,7 @@ class PasteSerializer(BaseImageSerializer):
     pic_link = serializers.SerializerMethodField()
     related = serializers.SerializerMethodField()
     sender = MemberListSerializer(read_only=True)
+    tags = PasteTagSerializer(many=True)
 
     def get_pic(self, object):
         # return paster.utils.get_pic_by_id(object.link)

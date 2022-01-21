@@ -96,6 +96,21 @@ class Member(models.Model):
         verbose_name_plural = 'Участники'
 
 
+class PasteTag(models.Model):
+    """
+    [PasteTag]
+    Модель тега пасты
+    """
+    name = models.CharField(max_length=150, verbose_name='Название')
+
+    def __str__(self) -> str:
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = 'Тег пасты'
+        verbose_name_plural = 'Теги паст'
+
+
 class Paste(models.Model):
     """
     [Paste]
@@ -106,6 +121,7 @@ class Paste(models.Model):
     last_relate = models.DateTimeField(default=timezone.now)
     sender = models.ForeignKey(Member, on_delete=SET_NULL, null=True, blank=True, verbose_name='Отправитель')
     last_publicate = models.DateTimeField(null=True, blank=True, verbose_name="Дата последней публикации")
+    tags = models.ManyToManyField(PasteTag, blank=True, verbose_name="Теги")
 
     @property
     def avg(self) -> float:

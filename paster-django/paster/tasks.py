@@ -1,3 +1,4 @@
+from email import message
 import requests
 from celery import shared_task
 
@@ -47,7 +48,14 @@ def daily_post():
     best = sorted(Paste.objects.all(), key=lambda t: t.daily_rating, reverse=True)[0]
     serializer = PasteSerializer(instance=best).data
 
-    message = f'#пастер_топдня\nЛучшая паста за день ({date.today().day}.{date.today().month}):'
+    tags = serializer.get('tags')
+    if not tags:
+        tags = '\n#пастер_рандом'
+    else:
+        tags = '\n' + '\n'.join(map(lambda x: '#пастер_' + x['name'].lower(), tags))
+    message = f'#пастер_топдня'
+    message += tags
+    message += f'\nЛучшая паста за день ({date.today().day}.{date.today().month}):'
     if best.sender:
         message += f'\nПасту прислал [id{best.sender.vk_id}|{best.sender.name}]'
     message += f'\n\n{best.clear_text}'
@@ -75,7 +83,13 @@ def regular_post():
     best.save()
     serializer = PasteSerializer(instance=best).data
 
-    message = f'#пастер_рандом\nОценить пасту: https://vk.com/app7983387#{best.id}'
+    tags = serializer.get('tags')
+    if not tags:
+        tags = '\n#пастер_рандом'
+    else:
+        tags = '\n' + '\n'.join(map(lambda x: '#пастер_' + x['name'].lower(), tags))
+    message = tags
+    message += f'\nОценить пасту: https://vk.com/app7983387#{best.id}'
     if best.sender:
         message += f'\nПасту прислал [id{best.sender.vk_id}|{best.sender.name}]'
     message += f'\n\n{best.clear_text}'

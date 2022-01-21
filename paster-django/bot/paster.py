@@ -1,4 +1,5 @@
 import re
+from django.test import tag
 import requests
 import bs4
 from bs4 import BeautifulSoup
@@ -158,7 +159,13 @@ if __name__ == '__main__':
                             rating = response['rating']
                             cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
+                            tags = response['tags']
+                            if not tags:
+                                tags = '\n#пастер_рандом'
+                            else:
+                                tags = '\n' + '\n'.join(map(lambda x: '#пастер_' + x['name'].lower(), tags))
                             mess = f'Данную пасту оценили {cnt} раз, рейтинг - {rating}⭐️'
+                            mess += tags
                             if response['sender']:
                                 mess += f'\nПасту прислал [id{response["sender"]["id"]}|{response["sender"]["name"]}]'
                             vk.messages.send(
@@ -179,7 +186,13 @@ if __name__ == '__main__':
                             rating = response['rating']
                             cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
+                            tags = response['tags']
+                            if not tags:
+                                tags = '\n#пастер_рандом'
+                            else:
+                                tags = '\n' + '\n'.join(map(lambda x: '#пастер_' + x['name'].lower(), tags))
                             mess = f'Данную пасту оценили {cnt} раз, рейтинг - {rating}⭐️'
+                            mess += tags
                             if response['sender']:
                                 mess += f'\nПасту прислал [id{response["sender"]["id"]}|{response["sender"]["name"]}]'
                             vk.messages.send(
@@ -281,7 +294,13 @@ if __name__ == '__main__':
                             rating = response['rating']
                             cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
+                            tags = response['tags']
+                            if not tags:
+                                tags = '\n#пастер_рандом'
+                            else:
+                                tags = '\n' + '\n'.join(map(lambda x: '#пастер_' + x['name'].lower(), tags))
                             mess = f'Данную пасту оценили {cnt} раз, рейтинг - {rating}⭐️'
+                            mess += tags
                             if response['sender']:
                                 mess += f'\nПасту прислал [id{response["sender"]["id"]}|{response["sender"]["name"]}]'
                             vk.messages.send(
@@ -302,7 +321,13 @@ if __name__ == '__main__':
                             rating = response['rating']
                             cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
+                            tags = response['tags']
+                            if not tags:
+                                tags = '\n#пастер_рандом'
+                            else:
+                                tags = '\n' + '\n'.join(map(lambda x: '#пастер_' + x['name'].lower(), tags))
                             mess = f'Данную пасту оценили {cnt} раз, рейтинг - {rating}⭐️'
+                            mess += tags
                             if response['sender']:
                                 mess += f'\nПасту прислал [id{response["sender"]["id"]}|{response["sender"]["name"]}]'
                             vk.messages.send(
