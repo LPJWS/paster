@@ -190,7 +190,7 @@ class Paste(models.Model):
         return self.link.split('/')[3].split('-')[1].split('_')[1]
 
     def __str__(self) -> str:
-        return f"{self.anno} ({self.link})"
+        return f"{self.anno} ({self.link}) ({', '.join([x.name for x in self.tags.all()]) if self.tags.all() else 'NOTAG'})"
 
     class Meta:
         verbose_name = 'Паста'
