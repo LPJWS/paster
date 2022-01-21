@@ -46,6 +46,9 @@ def daily_post():
     vk = vk_session.get_api()
     
     best = sorted(Paste.objects.all(), key=lambda t: t.daily_rating, reverse=True)[0]
+    if best.daily_rating == 0:
+        regular_post.delay()
+        return
     serializer = PasteSerializer(instance=best).data
 
     tags = serializer.get('tags')
