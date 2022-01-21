@@ -197,7 +197,7 @@ class PasteSerializer(BaseImageSerializer):
     pic_link = serializers.SerializerMethodField()
     related = serializers.SerializerMethodField()
     sender = MemberListSerializer(read_only=True)
-    tags = PasteTagSerializer(many=True)
+    tags = PasteTagSerializer(many=True, read_only=True)
 
     def get_pic(self, object):
         # return paster.utils.get_pic_by_id(object.link)
