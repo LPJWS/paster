@@ -75,6 +75,7 @@ class Member(models.Model):
     """
     vk_id = models.IntegerField(unique=True, verbose_name='VK id')
     name = models.CharField(max_length=75, null=True, blank=True, verbose_name='Имя')
+    is_moder = models.BooleanField(default=False, verbose_name='Модератор?')
 
     def __str__(self) -> str:
         return f"{self.name} ({self.vk_id})"

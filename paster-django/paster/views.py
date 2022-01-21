@@ -125,11 +125,6 @@ class PasteView(viewsets.ViewSet):
         paste = Paste.objects.get(id=id)
         return Response(self.serializer_class(instance=paste).data, status=status.HTTP_200_OK)
 
-    # @action(methods=['GET'], detail=False, url_path='get_marks/(?P<id>\d+)', url_name='Get paste marks', permission_classes=permission_classes)
-    # def get_paste_marks(self, request, id, *args, **kwargs):
-    #     paste = Paste.objects.get(id=id)
-    #     return Response(MarkPasteSerializer(instance=paste).data, status=status.HTTP_200_OK)
-
     @action(methods=['GET'], detail=False, url_path='get/rand', url_name='Get rand paste', permission_classes=permission_classes)
     def get_rand(self, request, *args, **kwargs):
         params = request.GET
@@ -206,6 +201,17 @@ class PasteView(viewsets.ViewSet):
         else:
             return Response({'status': 'already'})
 
+    @action(methods=['POST'], detail=False, url_path='tag', url_name='Tag paste', permission_classes=permission_classes)
+    def tag(self, request, *args, **kwargs):
+        data = request.data
+        paste = Paste.objects.get(id=data.get('id'))
+        serializer = self.serializer_class(data=data, instance=paste)
+        serializer.is_valid(raise_exception=True)
+        if serializer.tag(instance=paste, validated_data=data):
+            return Response({'status': 'ok'})
+        else:
+            return Response({'status': 'error'})
+
 
     @action(methods=['POST'], detail=False, url_path='add', url_name='Add paste to base', permission_classes=permission_classes)
     def add_paste(self, request, *args, **kwargs):
@@ -220,6 +226,30 @@ class PasteView(viewsets.ViewSet):
     def get_top(self, request, *args, **kwargs):
         pastes = sorted(Paste.objects.all(), key=lambda t: t.rating, reverse=True)[:20]
         return Response(PasteListSerializer(instance=pastes, many=True).data, status=status.HTTP_200_OK)
+
+    @action(methods=['DELETE'], detail=False, url_path='delete', url_name='Delete paste', permission_classes=permission_classes)
+    def delete_paste(self, request, *args, **kwargs):
+        data = request.data
+        paste = Paste.objects.get(id=data.get('id'))
+        serializer = self.serializer_class(data=data, instance=paste)
+        serializer.is_valid(raise_exception=True)
+        if serializer.delete(instance=paste, validated_data=data):
+            return Response({'status': 'ok'})
+        else:
+            return Response({'status': 'already'})
+
+
+class PasteTagView(viewsets.ViewSet):
+    """
+    Работа с тегами пастами
+    """
+    permission_classes = (AllowAny, )
+    serializer_class = PasteTagSerializer
+
+    @action(methods=['GET'], detail=False, url_path='all', url_name='Get all paste tags', permission_classes=permission_classes)
+    def get_paste_tags(self, request, *args, **kwargs):
+        tags = PasteTag.objects.all()
+        return Response(self.serializer_class(instance=tags, many=True).data, status=status.HTTP_200_OK)
 
 
 class MemberView(viewsets.ViewSet):

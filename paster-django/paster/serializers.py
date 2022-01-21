@@ -198,6 +198,7 @@ class PasteSerializer(BaseImageSerializer):
     related = serializers.SerializerMethodField()
     sender = MemberListSerializer(read_only=True)
     tags = PasteTagSerializer(many=True, read_only=True)
+    tags_new = serializers.ListField(write_only=True, required=False)
 
     def get_pic(self, object):
         # return paster.utils.get_pic_by_id(object.link)
@@ -244,6 +245,32 @@ class PasteSerializer(BaseImageSerializer):
             instance.save()
             return True
         return False
+
+    def tag(self, instance, validated_data):
+        try:
+            member = Member.objects.get(vk_id=validated_data.get('vk_id'))
+        except Member.DoesNotExist:
+            member_serializer = MemberSerializer(data=validated_data)
+            member_serializer.is_valid(raise_exception=True)
+            member = member_serializer.save()
+        if not member.is_moder:
+            raise ValidationError({"info": "You are not allowed"})
+        instance.tags.clear()
+        for tag_ in validated_data.get('tags_new'):
+            instance.tags.add(tag_)
+        return True
+
+    def delete(self, instance, validated_data):
+        try:
+            member = Member.objects.get(vk_id=validated_data.get('vk_id'))
+        except Member.DoesNotExist:
+            member_serializer = MemberSerializer(data=validated_data)
+            member_serializer.is_valid(raise_exception=True)
+            member = member_serializer.save()
+        if not member.is_moder:
+            raise ValidationError({"info": "You are not allowed"})
+        instance.delete()
+        return True
 
     class Meta:
         model = Paste

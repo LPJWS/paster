@@ -8,6 +8,7 @@ router = SimpleRouter()
 router.register(r'auth', AuthView, basename='auth')
 router.register(r'user', UserView, basename='user')
 router.register(r'paste', PasteView, basename='paste')
+router.register(r'tag', PasteTagView, basename='tag')
 router.register(r'member', MemberView, basename='member')
 router.register(r'wall', WallView, basename='wall')
 
