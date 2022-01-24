@@ -49,6 +49,8 @@ def accumulate():
         t = vk.wall.get(owner_id=-int(group), count=1, offset=num)
         id = t['items'][0]['id']
         text = t['items'][0]['text']
+        if not text:
+            continue
         link = f'https://vk.com/wall-{group}_{id}'
         paste, created = Paste.objects.get_or_create(link=link, text=text)
         if created:

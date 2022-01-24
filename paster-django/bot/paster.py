@@ -154,8 +154,12 @@ if __name__ == '__main__':
                         response = api(f'http://paster-web:8000/api/v1/paste/get/unrelated/?vk_id={from_id}')
                         attachment = ''
                         if 'link' in response.keys():
-                            group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
-                            wall_id = response['link'].split('/')[3].split('-')[1].split('_')[1]
+                            if response['link_self']:
+                                group_id = response['link_self'].split('/')[3].split('-')[1].split('_')[0]
+                                wall_id = response['link_self'].split('/')[3].split('-')[1].split('_')[1]
+                            else:
+                                group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
+                                wall_id = response['link'].split('/')[3].split('-')[1].split('_')[1]
                             rating = response['rating']
                             cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
@@ -181,8 +185,12 @@ if __name__ == '__main__':
                         response = api(f'http://paster-web:8000/api/v1/paste/get/rand/?vk_id={from_id}')
                         attachment = ''
                         if 'link' in response.keys():
-                            group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
-                            wall_id = response['link'].split('/')[3].split('-')[1].split('_')[1]
+                            if response['link_self']:
+                                group_id = response['link_self'].split('/')[3].split('-')[1].split('_')[0]
+                                wall_id = response['link_self'].split('/')[3].split('-')[1].split('_')[1]
+                            else:
+                                group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
+                                wall_id = response['link'].split('/')[3].split('-')[1].split('_')[1]
                             rating = response['rating']
                             cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
@@ -289,8 +297,12 @@ if __name__ == '__main__':
                         response = api(f'http://paster-web:8000/api/v1/paste/get/unrelated/?vk_id={from_id}')
                         attachment = ''
                         if 'link' in response.keys():
-                            group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
-                            wall_id = response['link'].split('/')[3].split('-')[1].split('_')[1]
+                            if response['link_self']:
+                                group_id = response['link_self'].split('/')[3].split('-')[1].split('_')[0]
+                                wall_id = response['link_self'].split('/')[3].split('-')[1].split('_')[1]
+                            else:
+                                group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
+                                wall_id = response['link'].split('/')[3].split('-')[1].split('_')[1]
                             rating = response['rating']
                             cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'
@@ -316,8 +328,12 @@ if __name__ == '__main__':
                         response = api(f'http://paster-web:8000/api/v1/paste/get/rand/?vk_id={from_id}')
                         attachment = ''
                         if 'link' in response.keys():
-                            group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
-                            wall_id = response['link'].split('/')[3].split('-')[1].split('_')[1]
+                            if response['link_self']:
+                                group_id = response['link_self'].split('/')[3].split('-')[1].split('_')[0]
+                                wall_id = response['link_self'].split('/')[3].split('-')[1].split('_')[1]
+                            else:
+                                group_id = response['link'].split('/')[3].split('-')[1].split('_')[0]
+                                wall_id = response['link'].split('/')[3].split('-')[1].split('_')[1]
                             rating = response['rating']
                             cnt = response['cnt']
                             attachment = f'wall-{group_id}_{wall_id}'

@@ -188,6 +188,33 @@ class PasteView(viewsets.ViewSet):
                 pastes = [x for x in pastes if x.cnt == min_cnt]
                 return Response(self.serializer_class(instance=pastes[random.randint(0, len(pastes)-1)]).data, status=status.HTTP_200_OK)
 
+    
+    @action(methods=['GET'], detail=False, url_path='get/untaged', url_name='Get untaged paste', permission_classes=permission_classes)
+    def get_untaged(self, request, *args, **kwargs):
+        params = request.GET
+        # if random.random() > 0.95:
+        #     paster.utils.accumulate()
+
+        if 'vk_id' in params.keys():
+            vk_id = params['vk_id']
+            try:
+                member = Member.objects.get(vk_id=vk_id)
+            except Member.DoesNotExist:
+                member_serializer = MemberSerializer(data=params)
+                member_serializer.is_valid(raise_exception=True)
+                member = member_serializer.save()
+            if not member.is_moder:
+                return Response({'info': 'You are not allowed'}, status=status.HTTP_403_FORBIDDEN)
+
+            pastes = Paste.objects.filter(tags=None)
+            if pastes:
+                paste = pastes[random.randint(0, len(pastes)-1)]
+                return Response(self.serializer_class(instance=paste, context={'member': member}).data, status=status.HTTP_200_OK)
+            else:
+                paste = paster.utils.accumulate()
+                return Response(self.serializer_class(instance=paste, context={'member': member}).data, status=status.HTTP_200_OK)
+        else:
+            return Response({'info': 'You are not allowed'}, status=status.HTTP_403_FORBIDDEN)
 
 
     @action(methods=['POST'], detail=False, url_path='relate', url_name='Relate paste', permission_classes=permission_classes)
