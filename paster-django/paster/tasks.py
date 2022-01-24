@@ -67,6 +67,9 @@ def daily_post():
 
     # vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, copyright=copyright, attachment=attach)
     vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, attachment=attach)
+    best.last_publicate = timezone.now()
+    best.link_self = f"https://vk.com/wall-{os.environ.get('VK_GROUP_ID')}_{res['post_id']}"
+    best.save()
 
 
 @app.task()
@@ -82,8 +85,6 @@ def regular_post():
         best = best[0]
     else:
         best = sorted(Paste.objects.filter(Q(last_publicate__isnull=False)), key=lambda t: t.last_publicate)[0]
-    best.last_publicate = timezone.now()
-    best.save()
     serializer = PasteSerializer(instance=best).data
 
     tags = serializer.get('tags')
@@ -100,5 +101,7 @@ def regular_post():
     attach = serializer.get('pic')
 
     # vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, copyright=copyright, attachment=attach)
-    vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, attachment=attach)
-
+    res = vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, attachment=attach)
+    best.last_publicate = timezone.now()
+    best.link_self = f"https://vk.com/wall-{os.environ.get('VK_GROUP_ID')}_{res['post_id']}"
+    best.save()

@@ -123,6 +123,7 @@ class Paste(models.Model):
     sender = models.ForeignKey(Member, on_delete=SET_NULL, null=True, blank=True, verbose_name='Отправитель')
     last_publicate = models.DateTimeField(null=True, blank=True, verbose_name="Дата последней публикации")
     tags = models.ManyToManyField(PasteTag, blank=True, verbose_name="Теги")
+    link_self = models.CharField(max_length=150, null=True, blank=True, verbose_name='Ссылка на пасту (в пастере)')
 
     @property
     def avg(self) -> float:
