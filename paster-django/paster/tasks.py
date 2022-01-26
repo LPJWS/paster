@@ -17,6 +17,7 @@ from datetime import datetime, timedelta, date
 import vk_api
 from django.db.models import Q
 from django.utils import timezone
+import urllib.request
 
 
 @app.task()
@@ -63,7 +64,16 @@ def daily_post():
         message += f'\nПасту прислал [id{best.sender.vk_id}|{best.sender.name}]'
     message += f'\n\n{best.clear_text}'
     copyright = best.link
-    attach = serializer.get('pic')
+    if not best.pic_self:
+        urllib.request.urlretrieve(serializer.get('pic_link'), settings.MEDIA_ROOT + "local-filename.jpg")
+        a = vk.photos.getAlbums(owner_id=f"-{os.environ.get('VK_GROUP_ID')}")
+        server = vk.photos.getUploadServer(album_id=a['items'][0]['id'], group_id=os.environ.get('VK_GROUP_ID'))['upload_url']
+        pfile = requests.post(server, files={'file1': open(settings.MEDIA_ROOT + 'local-filename.jpg', 'rb')}).json()
+        photo = vk.photos.save(album_id=a['items'][0]['id'], server=pfile['server'], photos_list=pfile['photos_list'], hash=pfile['hash'], group_id=pfile['gid'])[0]
+        best.pic_self = f"photo{photo['owner_id']}_{photo['id']}"
+        best.pic_link_self = photo.get('sizes')[-1].get('url')
+        best.save()
+    attach = best.pic_self
 
     # vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, copyright=copyright, attachment=attach)
     vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, attachment=attach)
@@ -98,7 +108,16 @@ def regular_post():
         message += f'\nПасту прислал [id{best.sender.vk_id}|{best.sender.name}]'
     message += f'\n\n{best.clear_text}'
     copyright = best.link
-    attach = serializer.get('pic')
+    if not best.pic_self:
+        urllib.request.urlretrieve(serializer.get('pic_link'), settings.MEDIA_ROOT + "local-filename.jpg")
+        a = vk.photos.getAlbums(owner_id=f"-{os.environ.get('VK_GROUP_ID')}")
+        server = vk.photos.getUploadServer(album_id=a['items'][0]['id'], group_id=os.environ.get('VK_GROUP_ID'))['upload_url']
+        pfile = requests.post(server, files={'file1': open(settings.MEDIA_ROOT + 'local-filename.jpg', 'rb')}).json()
+        photo = vk.photos.save(album_id=a['items'][0]['id'], server=pfile['server'], photos_list=pfile['photos_list'], hash=pfile['hash'], group_id=pfile['gid'])[0]
+        best.pic_self = f"photo{photo['owner_id']}_{photo['id']}"
+        best.pic_link_self = photo.get('sizes')[-1].get('url')
+        best.save()
+    attach = best.pic_self
 
     # vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, copyright=copyright, attachment=attach)
     res = vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, attachment=attach)
