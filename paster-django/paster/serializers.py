@@ -256,8 +256,11 @@ class PasteSerializer(BaseImageSerializer):
         if not member.is_moder:
             raise ValidationError({"info": "You are not allowed"})
         instance.tags.clear()
+        action = ModerTag.objects.create(member=member, paste=instance)
         for tag_ in validated_data.get('tags_new'):
             instance.tags.add(tag_)
+            action.tags.add(tag_)
+        action.save()
         return True
 
     def delete(self, instance, validated_data):

@@ -216,3 +216,37 @@ class Mark(models.Model):
         verbose_name = 'Оценка пасты'
         verbose_name_plural = 'Оценки паст'
         ordering = ('-created_at',)
+
+
+class ModerAction(models.Model):
+    """
+    [ModerAction]
+    Модель действий модера
+    """
+    member = models.ForeignKey(Member, null=True, blank=True, on_delete=CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self) -> str:
+        return f"{self.member.name} ({self.created_at})"
+
+    class Meta:
+        verbose_name = 'Действие модера'
+        verbose_name_plural = 'Действия модеров'
+        ordering = ('-created_at',)
+
+
+class ModerTag(ModerAction):
+    """
+    [ModerTag]
+    Модель тега модера
+    """
+    paste = models.ForeignKey(Paste, on_delete=CASCADE, verbose_name='Паста')
+    tags = models.ManyToManyField(PasteTag, blank=True, verbose_name="Теги")
+
+    def __str__(self) -> str:
+        return f"{self.member.name} ({self.paste.anno}) ({', '.join([x.name for x in self.tags.all()]) if self.tags.all() else 'NOTAG'}) ({self.created_at})"
+
+    class Meta:
+        verbose_name = 'Тег модера'
+        verbose_name_plural = 'Теги модеров'
+        ordering = ('-created_at',)
