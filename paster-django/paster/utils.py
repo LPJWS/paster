@@ -146,6 +146,9 @@ def get_suggests():
             member = Member.objects.create(vk_id=res['items'][-1]['from_id'])
             member.name = get_name_by_id(res['items'][-1]['from_id'])
             member.save()
+        if res['items'][-1].get('attachments'):
+            if res['items'][-1].get('attachments')[0]['type'] == 'photo':
+                return {'count': res['count'], 'item': res['items'][-1], 'member': {'id': member.vk_id, 'name': member.name}, 'photo': res['items'][-1].get('attachments')[0]['photo']['sizes'][-1].get('url')}
         return {'count': res['count'], 'item': res['items'][-1], 'member': {'id': member.vk_id, 'name': member.name}}
     else:
         return {'count': 0}
