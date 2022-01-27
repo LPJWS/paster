@@ -293,6 +293,20 @@ class PasteListSerializer(BaseImageSerializer):
         exclude = ('text',)
 
 
+class PasteRatingSerializer(BaseImageSerializer):
+    """
+    Сериализатор для детального отображения паст для рейтинга
+    """
+    avg = serializers.ReadOnlyField()
+    cnt = serializers.ReadOnlyField()
+    rating = serializers.ReadOnlyField()
+    clear_text = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Paste
+        fields = ('id', 'clear_text', 'cnt', 'avg', 'rating')
+
+
 class MarkSerializer(BaseImageSerializer):
     paste = PasteListSerializer()
 

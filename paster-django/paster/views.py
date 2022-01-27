@@ -192,8 +192,6 @@ class PasteView(viewsets.ViewSet):
     @action(methods=['GET'], detail=False, url_path='get/untaged', url_name='Get untaged paste', permission_classes=permission_classes)
     def get_untaged(self, request, *args, **kwargs):
         params = request.GET
-        # if random.random() > 0.95:
-        #     paster.utils.accumulate()
 
         if 'vk_id' in params.keys():
             vk_id = params['vk_id']
@@ -217,6 +215,12 @@ class PasteView(viewsets.ViewSet):
         else:
             return Response({'info': 'You are not allowed'}, status=status.HTTP_403_FORBIDDEN)
 
+    @action(methods=['GET'], detail=False, url_path='all/rating', url_name='Get all pastes to rating', permission_classes=permission_classes)
+    def get_all_rating(self, request, *args, **kwargs):
+        params = request.GET
+
+        pastes = Paste.objects.all()
+        return Response(PasteRatingSerializer(instance=pastes, many=True).data, status=status.HTTP_200_OK)
 
     @action(methods=['POST'], detail=False, url_path='relate', url_name='Relate paste', permission_classes=permission_classes)
     def relate(self, request, *args, **kwargs):
