@@ -187,11 +187,17 @@ class Paste(models.Model):
 
     @property
     def group(self) -> str:
-        return self.link.split('/')[3].split('-')[1].split('_')[0]
+        if self.link.startswith('http'):
+            return self.link.split('/')[3].split('-')[1].split('_')[0]
+        else:
+            return ''
 
     @property
     def post(self) -> str:
-        return self.link.split('/')[3].split('-')[1].split('_')[1]
+        if self.link.startswith('http'):
+            return self.link.split('/')[3].split('-')[1].split('_')[1]
+        else:
+            return ''
 
     def __str__(self) -> str:
         return f"{self.anno} ({self.link}) ({', '.join([x.name for x in self.tags.all()]) if self.tags.all() else 'NOTAG'})"
