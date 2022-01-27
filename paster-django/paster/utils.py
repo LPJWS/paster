@@ -139,7 +139,16 @@ def get_suggests():
     vk = vk_session.get_api()
 
     res = vk.wall.get(owner_id=f"-{os.environ.get('VK_GROUP_ID')}", filter='suggests')
-    return res
+    if res.get('items'):
+        try:
+            member = Member.objects.get(vk_id=res['items'][-1]['from_id'])
+        except Member.DoesNotExist:
+            member = Member.objects.create(vk_id=res['items'][-1]['from_id'])
+            member.name = get_name_by_id(res['items'][-1]['from_id'])
+            member.save()
+        return {'count': res['count'], 'item': res['items'][-1]}
+    else:
+        return {'count': 0}
 
 
 def post_suggest(post_id, tags):
