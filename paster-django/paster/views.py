@@ -315,3 +315,20 @@ class WallView(viewsets.ViewSet):
         # daily_post.delay()
         regular_post.delay()
         return Response(status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=False, url_path='suggests', url_name='Get all suggests', permission_classes=permission_classes)
+    def get_suggests_view(self, request, *args, **kwargs):
+        res = paster.utils.get_suggests()
+        return Response(res, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False, url_path='suggests/post', url_name='Post suggest', permission_classes=permission_classes)
+    def post_suggest_view(self, request, *args, **kwargs):
+        data = request.data
+        res = paster.utils.post_suggest(data['id'], data['tags'])
+        return Response(res, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False, url_path='suggests/deny', url_name='Deny suggest', permission_classes=permission_classes)
+    def deny_suggest_view(self, request, *args, **kwargs):
+        data = request.data
+        res = paster.utils.deny_suggest(data['id'])
+        return Response(res, status=status.HTTP_200_OK)

@@ -4,8 +4,11 @@ from email.mime.text import MIMEText
 import os
 import vk_api
 import random
+import urllib.request
+import requests
 
 from paster.models import *
+
 
 VK_SERVICE = os.environ.get('VK_SERVICE')
 GROUPS = ['108531402', '92157416', '157651636']
@@ -17,7 +20,6 @@ def get_name_by_id(user_id):
     vk_session = vk_api.VkApi(token=VK_SERVICE)
     vk = vk_session.get_api()
     t = vk.users.get(user_ids=(user_id,), lang='ru')[0]
-    print(t)
     return t['first_name'] + ' ' + t['last_name'] 
 
 
@@ -130,3 +132,67 @@ def wall_post(message='TEST', copyright=None):
     vk = vk_session.get_api()
 
     vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, copyright=copyright)
+
+
+def get_suggests():
+    vk_session = vk_api.VkApi(token=VK_OAUTH)
+    vk = vk_session.get_api()
+
+    res = vk.wall.get(owner_id=f"-{os.environ.get('VK_GROUP_ID')}", filter='suggests')
+    return res
+
+
+def post_suggest(post_id, tags):
+    vk_session = vk_api.VkApi(token=VK_OAUTH)
+    vk = vk_session.get_api()
+
+    post = vk.wall.getById(posts=f"-{os.environ.get('VK_GROUP_ID')}_{post_id}")
+    try:
+        member = Member.objects.get(vk_id=post[0]['from_id'])
+    except Member.DoesNotExist:
+        member = Member.objects.create(vk_id=post[0]['from_id'])
+        member.name = get_name_by_id(post[0]['from_id'])
+        member.save()
+    paste = Paste.objects.create(sender=member, text=post[0]['text'], link=''.join(random.choices('qwertyuiopasdfghjklzxcvbnm1234567890', k=10)))
+    for tag in tags:
+        paste.tags.add(tag)
+    paste.save()
+
+    tags_ = paste.tags.all()
+    if not tags_:
+        tags_ = '\n#пастер_рандом'
+    else:
+        tags_ = '\n' + '\n'.join(map(lambda x: '#пастер_' + x.name.lower(), tags_))
+    message = f'#пастер_предложка'
+    message += tags_
+    message += f'\nОценить пасту: https://vk.com/app7983387#{paste.id}'
+    if paste.sender:
+        message += f'\nПасту прислал [id{paste.sender.vk_id}|{paste.sender.name}]'
+    message += f'\n\n{paste.clear_text}'
+
+    if post[0].get('attachments'):
+        if post[0].get('attachments')[0]['type'] == 'photo':
+            rand_link = post[0].get('attachments')[0]['photo']['sizes'][-1].get('url')
+        else:
+            rand_link = get_rand_pic_link(paste.link)
+    else:
+        rand_link = get_rand_pic_link(paste.link)
+    urllib.request.urlretrieve(rand_link, settings.MEDIA_ROOT + "local-filename.jpg")
+    a = vk.photos.getAlbums(owner_id=f"-{os.environ.get('VK_GROUP_ID')}")
+    server = vk.photos.getUploadServer(album_id=a['items'][0]['id'], group_id=os.environ.get('VK_GROUP_ID'))['upload_url']
+    pfile = requests.post(server, files={'file1': open(settings.MEDIA_ROOT + 'local-filename.jpg', 'rb')}).json()
+    photo = vk.photos.save(album_id=a['items'][0]['id'], server=pfile['server'], photos_list=pfile['photos_list'], hash=pfile['hash'], group_id=pfile['gid'])[0]
+    paste.pic_self = f"photo{photo['owner_id']}_{photo['id']}"
+    paste.pic_link_self = photo.get('sizes')[-1].get('url')
+    paste.save()
+
+    res = vk.wall.post(owner_id=f"-{os.environ.get('VK_GROUP_ID')}", post_id=post_id, signed=1, message=message, attachments=paste.pic_self)
+    return res
+
+
+def deny_suggest(post_id):
+    vk_session = vk_api.VkApi(token=VK_OAUTH)
+    vk = vk_session.get_api()
+
+    res = vk.wall.delete(owner_id=f"-{os.environ.get('VK_GROUP_ID')}", post_id=post_id)
+    return res
