@@ -90,11 +90,11 @@ def regular_post():
     vk = vk_session.get_api()
     
     # time_threshold = datetime.now(timezone.now()) - timedelta(days=14)
-    best = Paste.objects.filter(Q(last_publicate__isnull=True))
+    best = Paste.objects.filter(Q(last_publicate__isnull=True) & ~Q(tags=None))
     if best:
         best = best[0]
     else:
-        best = sorted(Paste.objects.filter(Q(last_publicate__isnull=False)), key=lambda t: t.last_publicate)[0]
+        best = sorted(Paste.objects.filter(Q(last_publicate__isnull=False) & ~Q(tags=None)), key=lambda t: t.last_publicate)[0]
     serializer = PasteSerializer(instance=best).data
 
     tags = serializer.get('tags')
