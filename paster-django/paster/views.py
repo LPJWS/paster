@@ -167,8 +167,8 @@ class PasteView(viewsets.ViewSet):
             pastes = sorted(Paste.objects.all().exclude(id__in=related), key=lambda t: t.cnt)
 
             if pastes:
-                min_cnt = pastes[0].cnt
-                pastes = [x for x in pastes if x.cnt == min_cnt]
+                # min_cnt = pastes[0].cnt
+                # pastes = [x for x in pastes if x.cnt == min_cnt]
                 return Response(self.serializer_class(instance=pastes[random.randint(0, len(pastes)-1)], context={'member': member}).data, status=status.HTTP_200_OK)
             else:
                 paste = paster.utils.accumulate()
