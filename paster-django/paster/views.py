@@ -210,7 +210,9 @@ class PasteView(viewsets.ViewSet):
             else:
                 paste = paster.utils.accumulate()
             res = self.serializer_class(instance=paste, context={'member': member}).data
+            tagged = Paste.objects.filter(~Q(tags=None))
             res['untaged'] = len(pastes)
+            res['tagged'] = len(tagged)
             return Response(res, status=status.HTTP_200_OK)
         else:
             return Response({'info': 'You are not allowed'}, status=status.HTTP_403_FORBIDDEN)
