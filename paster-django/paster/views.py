@@ -1,5 +1,6 @@
 from random import randint
 import re
+from urllib import response
 from django.db.models.deletion import SET_NULL
 from django.shortcuts import render
 from rest_framework import status, generics, viewsets
@@ -8,6 +9,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.password_validation import validate_password
+from django.core.paginator import Paginator
 
 from paster.models import ConfirmCode, User
 from paster.serializers import *
@@ -255,6 +257,25 @@ class PasteView(viewsets.ViewSet):
         paste = serializer.save()
         return Response(self.serializer_class(instance=paste).data)
 
+    @action(methods=['GET'], detail=False, url_path='get/all', url_name='Get all pastes', permission_classes=permission_classes)
+    def get_all(self, request, *args, **kwargs):
+        params = request.GET
+        tag = params.get('tag', None)
+        cnt = params.get('cnt', 20)
+        page = params.get('page', 1)
+        if tag:
+            pastes = Paste.objects.filter(tags__in=tag).distinct()
+        else:
+            pastes = Paste.objects.all()
+        p = Paginator(pastes, cnt)
+        try:
+            page_ = p.page(page)
+        except Exception:
+            return Response({'info': 'Page not found'}, status=status.HTTP_404_NOT_FOUND)
+        pastes = page_.object_list
+        res = {'response': PasteListSerializer(instance=pastes, many=True).data}
+        res['page_cnt'] = p.num_pages
+        return Response(res, status=status.HTTP_200_OK)
 
     @action(methods=['GET'], detail=False, url_path='get/top', url_name='Get top pastes', permission_classes=permission_classes)
     def get_top(self, request, *args, **kwargs):

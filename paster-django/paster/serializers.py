@@ -287,6 +287,7 @@ class PasteListSerializer(BaseImageSerializer):
     anno = serializers.ReadOnlyField()
     group = serializers.ReadOnlyField()
     post = serializers.ReadOnlyField()
+    tags = PasteTagSerializer(many=True, read_only=True)
 
     class Meta:
         model = Paste
