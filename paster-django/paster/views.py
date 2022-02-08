@@ -264,7 +264,7 @@ class PasteView(viewsets.ViewSet):
         cnt = params.get('cnt', 20)
         page = params.get('page', 1)
         if tag:
-            pastes = Paste.objects.filter(tags__in=tag).distinct()
+            pastes = Paste.objects.filter(tags=tag).distinct()
         else:
             pastes = Paste.objects.all()
         p = Paginator(pastes, cnt)
