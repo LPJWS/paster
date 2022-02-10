@@ -76,7 +76,7 @@ def daily_post():
     attach = best.pic_self
 
     # vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, copyright=copyright, attachment=attach)
-    vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, attachment=attach)
+    res = vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, attachment=attach)
     best.last_publicate = timezone.now()
     best.link_self = f"https://vk.com/wall-{os.environ.get('VK_GROUP_ID')}_{res['post_id']}"
     best.save()
