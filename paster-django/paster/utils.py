@@ -6,6 +6,7 @@ import vk_api
 import random
 import urllib.request
 import requests
+from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 
 from paster.models import *
 
@@ -14,6 +15,7 @@ VK_SERVICE = os.environ.get('VK_SERVICE')
 GROUPS = ['108531402', '92157416', '157651636']
 VK_OAUTH = os.environ.get('VK_OAUTH')
 VK_GROUP_ID = os.environ.get('VK_GROUP_ID')
+VK_TOKEN = os.environ.get('VK_TOKEN')
 
 
 def get_name_by_id(user_id):
@@ -208,3 +210,20 @@ def deny_suggest(post_id):
 
     res = vk.wall.delete(owner_id=f"-{os.environ.get('VK_GROUP_ID')}", post_id=post_id)
     return res
+
+
+def get_chat_name(_chat_id):
+    vk_session = vk_api.VkApi(token=VK_TOKEN)
+    vk = vk_session.get_api()
+    try:
+        res = vk.messages.getConversationsById(peer_ids=[2000000000 + _chat_id], group_id=os.environ.get('VK_GROUP_ID'))['items'][0][
+        'chat_settings']['title']
+    except Exception:
+        res = 'NONAME'
+    return res
+
+
+def get_enable_keyboard():
+    keyboard = VkKeyboard(inline=True)
+    keyboard.add_button('Отключить уведомления', color=VkKeyboardColor.PRIMARY)
+    return keyboard.get_keyboard()

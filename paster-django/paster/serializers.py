@@ -314,3 +314,22 @@ class MarkSerializer(BaseImageSerializer):
     class Meta:
         model = Mark
         fields = '__all__'
+
+
+class ChatSerializer(BaseImageSerializer):
+    """
+    Сериализатор для чатов
+    """
+    name = serializers.CharField(required=False)
+
+    def create(self, validated_data):
+        chat, created = Chat.objects.get_or_create(
+            chat_id=validated_data.get('chat_id')
+        )
+        if created:
+            chat.save()
+        return chat
+
+    class Meta:
+        model = Chat
+        fields = '__all__'

@@ -258,3 +258,23 @@ class ModerTag(ModerAction):
         verbose_name = 'Тег модера'
         verbose_name_plural = 'Теги модеров'
         ordering = ('-created_at',)
+
+
+class Chat(models.Model):
+    """
+    [Chat]
+    Модель чата
+    """
+    chat_id = models.IntegerField(unique=True, verbose_name='Chat id')
+    name = models.CharField(max_length=100, verbose_name='Имя чата')
+    messages_enabled = models.BooleanField(default=True, verbose_name='Разрешены сообщения?')
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.chat_id})"
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['chat_id',]),
+        ]
+        verbose_name = 'Чат'
+        verbose_name_plural = 'Чаты'

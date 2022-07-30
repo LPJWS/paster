@@ -1,13 +1,23 @@
 import os
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 
-def get_main_keyboard():
+def get_main_keyboard(enabled=True, is_chat=False):
     keyboard = VkKeyboard(inline=True)
     keyboard.add_button('Паста', color=VkKeyboardColor.PRIMARY)
     keyboard.add_button('Случайная паста', color=VkKeyboardColor.PRIMARY)
     keyboard.add_line()
     keyboard.add_button('ТОП', color=VkKeyboardColor.PRIMARY)
     keyboard.add_button('ТОП Участников', color=VkKeyboardColor.PRIMARY)
+    if is_chat:
+        keyboard.add_line()
+        keyboard.add_button(
+            'Отключить уведомления' if enabled else 'Включить уведомления', 
+            color=VkKeyboardColor.POSITIVE if enabled else VkKeyboardColor.NEGATIVE)
+    return keyboard.get_keyboard()
+
+def get_enable_keyboard():
+    keyboard = VkKeyboard(inline=True)
+    keyboard.add_button('Отключить уведомления', color=VkKeyboardColor.PRIMARY)
     return keyboard.get_keyboard()
 
 service = os.environ.get('VK_SERVICE')

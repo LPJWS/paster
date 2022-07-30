@@ -35,7 +35,7 @@ def api(url, method='get', data={}):
     return json.loads(soup.text)
 
 
-def paste_keyboard(data={}):
+def paste_keyboard(data={}, enabled=True, is_chat=False):
     keyboard = VkKeyboard(inline=True)
     keyboard.add_button(config.marks_keys_inv[1], color=VkKeyboardColor.NEGATIVE, payload={'paste': data['paste']})
     keyboard.add_button(config.marks_keys_inv[2], color=VkKeyboardColor.NEGATIVE, payload={'paste': data['paste']})
@@ -50,6 +50,11 @@ def paste_keyboard(data={}):
     keyboard.add_line()
     keyboard.add_button('ТОП', color=VkKeyboardColor.PRIMARY)
     keyboard.add_button('ТОП Участников', color=VkKeyboardColor.PRIMARY)
+    if is_chat:
+        keyboard.add_line()
+        keyboard.add_button(
+            'Отключить уведомления' if enabled else 'Включить уведомления', 
+            color=VkKeyboardColor.POSITIVE if enabled else VkKeyboardColor.NEGATIVE)
     return keyboard.get_keyboard()
 
 
@@ -95,6 +100,7 @@ if __name__ == '__main__':
                     chat_id = event.chat_id
                     mess_id = event.object['conversation_message_id']
                     peer_id = event.object['peer_id']
+                    chat = api(f'http://paster-web:8000/api/v1/chat/get/{chat_id}/')
 
                     if event.object['attachments']:
                         if event.object['attachments'][0]['type'] == 'wall' \
@@ -109,7 +115,7 @@ if __name__ == '__main__':
                                 random_id=get_random_id(), 
                                 message='Обнаружена паста\nОцените пожалуйста',
                                 forward=json.dumps({'peer_id': peer_id, 'is_reply': True, 'conversation_message_ids': [mess_id]}),
-                                keyboard=paste_keyboard({'paste': response['id']}),
+                                keyboard=paste_keyboard({'paste': response['id']}, enabled=chat.get('messages_enabled', True), is_chat=True),
                             )
                             continue
                         elif event.object['attachments'][0]['type'] == 'link' \
@@ -120,7 +126,7 @@ if __name__ == '__main__':
                                 random_id=get_random_id(), 
                                 message='Обнаружена паста\nОцените пожалуйста',
                                 forward=json.dumps({'peer_id': peer_id, 'is_reply': True, 'conversation_message_ids': [mess_id]}),
-                                keyboard=paste_keyboard({'paste': response['id']}),
+                                keyboard=paste_keyboard({'paste': response['id']}, enabled=chat.get('messages_enabled', True), is_chat=True),
                             )
                             continue
                     
@@ -176,7 +182,7 @@ if __name__ == '__main__':
                                 chat_id=chat_id, 
                                 random_id=get_random_id(), 
                                 message=mess,
-                                keyboard=paste_keyboard({'paste': response['id']}),
+                                keyboard=paste_keyboard({'paste': response['id']}, enabled=chat.get('messages_enabled', True), is_chat=True),
                                 attachment=attachment
                             )
                         continue
@@ -206,7 +212,7 @@ if __name__ == '__main__':
                             vk.messages.send(
                                 chat_id=chat_id, 
                                 random_id=get_random_id(),
-                                keyboard=paste_keyboard({'paste': response['id']}),
+                                keyboard=paste_keyboard({'paste': response['id']}, enabled=chat.get('messages_enabled', True), is_chat=True),
                                 attachment=attachment,
                                 message=mess
                             )
@@ -217,13 +223,14 @@ if __name__ == '__main__':
                         mess = "Лучшие пасты:\n\nПаста - рейтинг - кол-во оценок\n\n"
                         i = 1
                         for paste in response:
-                            mess += f"{i}. [{paste['link']}|{paste['anno']}] {paste['rating']}⭐️ {paste['cnt']}🧮\n\n"
-                            i += 1
+                            if paste['link_self']:
+                                mess += f"{i}. [{paste['link_self']}|{paste['anno']}] {paste['rating']}⭐️ {paste['cnt']}🧮\n\n"
+                                i += 1
                         vk.messages.send(
                             chat_id=chat_id, 
                             random_id=get_random_id(),
                             message=mess,
-                            keyboard=config.main_keyboard
+                            keyboard=config.get_main_keyboard(enabled=chat.get('messages_enabled', True), is_chat=True)
                         )
                         continue
 
@@ -238,7 +245,7 @@ if __name__ == '__main__':
                             chat_id=chat_id, 
                             random_id=get_random_id(),
                             message=mess,
-                            keyboard=config.main_keyboard
+                            keyboard=config.get_main_keyboard(enabled=chat.get('messages_enabled', True), is_chat=True)
                         )
                         continue
 
@@ -246,12 +253,45 @@ if __name__ == '__main__':
                         vk.messages.send(
                             chat_id=chat_id, 
                             random_id=get_random_id(),
-                            keyboard=config.main_keyboard,
+                            keyboard=config.get_main_keyboard(enabled=chat.get('messages_enabled', True), is_chat=True),
                             message='Чего хочешь, дорогой? Инфа если что есть на стене'
                         )
                         continue
 
-                    pass
+                    if text.lower() == 'отключить уведомления':
+                        api(
+                            'http://paster-web:8000/api/v1/chat/update/', 
+                            method='post', 
+                            data={
+                                'chat_id': chat_id,
+                                'enable': False,
+                            }
+                        )
+                        vk.messages.send(
+                            chat_id=chat_id, 
+                            random_id=get_random_id(),
+                            keyboard=config.get_main_keyboard(enabled=False, is_chat=True),
+                            message='Ну куда?(\nЛадно, если захотите снова включить рассылку, напишите Включить рассылку'
+                        )
+                        continue
+
+                    if text.lower() == 'включить уведомления':
+                        api(
+                            'http://paster-web:8000/api/v1/chat/update/', 
+                            method='post', 
+                            data={
+                                'chat_id': chat_id,
+                                'enable': True,
+                            }
+                        )
+                        vk.messages.send(
+                            chat_id=chat_id, 
+                            random_id=get_random_id(),
+                            keyboard=config.get_main_keyboard(enabled=True, is_chat=True),
+                            message='Супер, теперь вы будете получать пасты дня'
+                        )
+                        continue
+
                 else:
                     if event.object['attachments'] \
                         and event.object['attachments'][0]['type'] == 'wall' \
@@ -360,8 +400,9 @@ if __name__ == '__main__':
                         mess = "Лучшие пасты:\n\nПаста - рейтинг - кол-во оценок\n\n"
                         i = 1
                         for paste in response:
-                            mess += f"{i}. [{paste['link']}|{paste['anno']}] {paste['rating']}⭐️ {paste['cnt']}🧮\n\n"
-                            i += 1
+                            if paste['link_self']:
+                                mess += f"{i}. [{paste['link_self']}|{paste['anno']}] {paste['rating']}⭐️ {paste['cnt']}🧮\n\n"
+                                i += 1
                         vk.messages.send(
                             user_id=from_id, 
                             random_id=get_random_id(),

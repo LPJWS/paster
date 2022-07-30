@@ -361,3 +361,44 @@ class WallView(viewsets.ViewSet):
         data = request.data
         res = paster.utils.deny_suggest(data['id'])
         return Response(res, status=status.HTTP_200_OK)
+
+
+class ChatView(viewsets.ViewSet):
+    """
+    Работа с чатами
+    """
+    permission_classes = (AllowAny, )
+    serializer_class = ChatSerializer
+
+    @action(methods=['POST'], detail=False, url_path='create', url_name='Create chat', permission_classes=permission_classes)
+    def create_chat(self, request, *args, **kwargs):
+        data = request.data
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        chat = serializer.save()
+        return Response(self.serializer_class(instance=chat).data, status=status.HTTP_201_CREATED)
+
+    @action(methods=['POST'], detail=False, url_path='update', url_name='Update chat', permission_classes=permission_classes)
+    def update_chat(self, request, *args, **kwargs):
+        data = request.data
+        
+        chat = Chat.objects.get(chat_id=data.get('chat_id'))
+        if "enable" in data.keys():
+            chat.messages_enabled = data['enable']
+        chat.save()
+        return Response(self.serializer_class(instance=chat).data, status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=False, url_path='refresh', url_name='Refresh chat names', permission_classes=permission_classes)
+    def refresh_chats(self, request, *args, **kwargs):
+        chats = Chat.objects.all()
+        for chat in chats:
+            chat.name = paster.utils.get_chat_name(chat.chat_id)
+            chat.save()
+        return Response({'info': 'ok'}, status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=False, url_path='get/(?P<id>\d+)', url_name='Get chat', permission_classes=permission_classes)
+    def get_chat(self, request, id, *args, **kwargs):
+        chat, created = Chat.objects.get_or_create(chat_id=id)
+        if created:
+            chat.save()
+        return Response(self.serializer_class(instance=chat).data, status=status.HTTP_200_OK)

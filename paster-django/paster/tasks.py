@@ -10,14 +10,16 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
 
-from paster.models import User, Paste
+from paster.models import User, Paste, Chat
 from paster.serializers import PasteSerializer
 
 from datetime import datetime, timedelta, date
 import vk_api
+from vk_api.utils import get_random_id
 from django.db.models import Q
 from django.utils import timezone
 import urllib.request
+import paster.utils
 
 
 @app.task()
@@ -86,8 +88,11 @@ def daily_post():
 def regular_post():
     VK_OAUTH = os.environ.get('VK_OAUTH')
     VK_GROUP_ID = os.environ.get('VK_GROUP_ID')
+    VK_TOKEN = os.environ.get('VK_TOKEN')
     vk_session = vk_api.VkApi(token=VK_OAUTH)
     vk = vk_session.get_api()
+    vk_session_bot = vk_api.VkApi(token=VK_TOKEN)
+    vk_bot = vk_session_bot.get_api()
     
     # time_threshold = datetime.now(timezone.now()) - timedelta(days=14)
     best = Paste.objects.filter(Q(last_publicate__isnull=True) & ~Q(tags=None))
@@ -121,6 +126,20 @@ def regular_post():
 
     # vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, copyright=copyright, attachment=attach)
     res = vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, attachment=attach)
+
+    chats = Chat.objects.filter(messages_enabled=True)
+    for chat in chats:
+        try:
+            vk_bot.messages.send(
+                chat_id=chat.chat_id, 
+                random_id=get_random_id(),
+                message="Паста дня",
+                keyboard=paster.utils.get_enable_keyboard(),
+                attachment=f"wall-{os.environ.get('VK_GROUP_ID')}_{res['post_id']}"
+            )
+        except Exception:
+            continue
+
     best.last_publicate = timezone.now()
     best.link_self = f"https://vk.com/wall-{os.environ.get('VK_GROUP_ID')}_{res['post_id']}"
     best.save()
