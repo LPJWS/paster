@@ -64,7 +64,8 @@ def daily_post():
         tags = '\n' + '\n'.join(map(lambda x: '#пастер_' + x['name'].lower(), tags))
     message = f'#пастер_топдня'
     message += tags
-    message += f'\nЛучшая паста за день ({date.today().day}.{date.today().month}):'
+    day, month = date.today().day, date.today().month
+    message += f'\nЛучшая паста за день ({day if day > 9 else "0" + str(day)}.{month if month > 9 else "0" + str(month)}):'
     if best.sender:
         message += f'\nПасту прислал [id{best.sender.vk_id}|{best.sender.name}]'
     message += f'\n\n{best.clear_text}'
