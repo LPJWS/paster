@@ -47,3 +47,5 @@ flower
 mpu
 vk_api
 beautifulsoup4
+pytelegrambotapi
+telegraph

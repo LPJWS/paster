@@ -1,0 +1,4 @@
+pytelegrambotapi
+vk_api
+beautifulsoup4
+lxml

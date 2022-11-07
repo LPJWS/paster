@@ -21,6 +21,9 @@ from django.utils import timezone
 import urllib.request
 import paster.utils
 
+import telebot
+from telegraph import Telegraph
+
 
 @app.task()
 def send_email(m: str, to: str, s: str):
@@ -46,10 +49,15 @@ def daily_post():
     VK_OAUTH = os.environ.get('VK_OAUTH')
     VK_GROUP_ID = os.environ.get('VK_GROUP_ID')
     VK_TOKEN = os.environ.get('VK_TOKEN')
+    TG_TOKEN = os.environ.get('TG_TOKEN')
+    TG_CHANNEL = os.environ.get('TG_CHANNEL')
+    TGP_TOKEN = os.environ.get('TGP_TOKEN')
     vk_session = vk_api.VkApi(token=VK_OAUTH)
     vk = vk_session.get_api()
     vk_session_bot = vk_api.VkApi(token=VK_TOKEN)
     vk_bot = vk_session_bot.get_api()
+    tg_bot = telebot.TeleBot(TG_TOKEN)
+    tgp = Telegraph(TGP_TOKEN)
     
     best = sorted(Paste.objects.all(), key=lambda t: t.daily_rating, reverse=True)[0]
     if best.daily_rating == 0:
@@ -66,8 +74,8 @@ def daily_post():
     message += tags
     day, month = date.today().day, date.today().month
     message += f'\nЛучшая паста за день ({day if day > 9 else "0" + str(day)}.{month if month > 9 else "0" + str(month)}):'
-    if best.sender:
-        message += f'\nПасту прислал [id{best.sender.vk_id}|{best.sender.name}]'
+    # if best.sender:
+    #     message += f'\nПасту прислал [id{best.sender.vk_id}|{best.sender.name}]'
     message += f'\n\n{best.clear_text}'
     copyright = best.link
     if not best.pic_self:
@@ -101,13 +109,30 @@ def daily_post():
     best.link_self = f"https://vk.com/wall-{os.environ.get('VK_GROUP_ID')}_{res['post_id']}"
     best.save()
 
+    message = tags
+    message += f'\n\n{best.clear_text}'
+    message_tgp = ""
+    for message_line in message.split("\n"):
+        message_tgp += f"<p>{message_line}</p>"
+    message_tgp += f"<img src=\"{best.pic_link_self}\">"
+    res = tgp.create_page(
+        title=best.anno,
+        html_content=message_tgp
+    )
+    tg_bot.send_message(chat_id=f"@{TG_CHANNEL}", text=f"{tags}\n{res['url']}")
+    tg_bot.close()
 
 @app.task()
 def regular_post():
     VK_OAUTH = os.environ.get('VK_OAUTH')
     VK_GROUP_ID = os.environ.get('VK_GROUP_ID')
+    TG_TOKEN = os.environ.get('TG_TOKEN')
+    TG_CHANNEL = os.environ.get('TG_CHANNEL')
+    TGP_TOKEN = os.environ.get('TGP_TOKEN')
     vk_session = vk_api.VkApi(token=VK_OAUTH)
     vk = vk_session.get_api()
+    tg_bot = telebot.TeleBot(TG_TOKEN)
+    tgp = Telegraph(TGP_TOKEN)
     
     # time_threshold = datetime.now(timezone.now()) - timedelta(days=14)
     best = Paste.objects.filter(Q(last_publicate__isnull=True) & ~Q(tags=None))
@@ -124,8 +149,8 @@ def regular_post():
         tags = '\n' + '\n'.join(map(lambda x: '#пастер_' + x['name'].lower(), tags))
     message = tags
     message += f'\nОценить пасту: https://vk.com/app7983387#{best.id}'
-    if best.sender:
-        message += f'\nПасту прислал [id{best.sender.vk_id}|{best.sender.name}]'
+    # if best.sender:
+    #     message += f'\nПасту прислал [id{best.sender.vk_id}|{best.sender.name}]'
     message += f'\n\n{best.clear_text}'
     copyright = best.link
     if not best.pic_self:
@@ -144,3 +169,16 @@ def regular_post():
     best.last_publicate = timezone.now()
     best.link_self = f"https://vk.com/wall-{os.environ.get('VK_GROUP_ID')}_{res['post_id']}"
     best.save()
+
+    message = tags
+    message += f'\n\n{best.clear_text}'
+    message_tgp = ""
+    for message_line in message.split("\n"):
+        message_tgp += f"<p>{message_line}</p>"
+    message_tgp += f"<img src=\"{best.pic_link_self}\">"
+    res = tgp.create_page(
+        title=best.anno,
+        html_content=message_tgp
+    )
+    tg_bot.send_message(chat_id=f"@{TG_CHANNEL}", text=f"{tags}\n{res['url']}")
+    tg_bot.close()
