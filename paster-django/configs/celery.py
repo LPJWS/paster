@@ -28,9 +28,15 @@ app.conf.beat_schedule = {
                             minute=59,
                             )
     },
-    'regular_post_3': {
+    'regular_post_2': {
         'task': 'paster.tasks.regular_post',
-        'schedule': crontab(hour='3',
+        'schedule': crontab(hour='2',
+                            minute=0,
+                            )
+    },
+    'regular_post_4': {
+        'task': 'paster.tasks.regular_post',
+        'schedule': crontab(hour='4',
                             minute=0,
                             )
     },
@@ -40,9 +46,15 @@ app.conf.beat_schedule = {
                             minute=0,
                             )
     },
-    'regular_post_9': {
+    'regular_post_8': {
         'task': 'paster.tasks.regular_post',
-        'schedule': crontab(hour='9',
+        'schedule': crontab(hour='8',
+                            minute=0,
+                            )
+    },
+    'regular_post_10': {
+        'task': 'paster.tasks.regular_post',
+        'schedule': crontab(hour='10',
                             minute=0,
                             )
     },
@@ -52,9 +64,15 @@ app.conf.beat_schedule = {
                             minute=0,
                             )
     },
-    'regular_post_15': {
+    'regular_post_14': {
         'task': 'paster.tasks.regular_post',
-        'schedule': crontab(hour='15',
+        'schedule': crontab(hour='14',
+                            minute=0,
+                            )
+    },
+    'regular_post_16': {
+        'task': 'paster.tasks.regular_post',
+        'schedule': crontab(hour='16',
                             minute=0,
                             )
     },
@@ -64,9 +82,15 @@ app.conf.beat_schedule = {
                             minute=0,
                             )
     },
-    'regular_post_21': {
+    'regular_post_20': {
         'task': 'paster.tasks.regular_post',
-        'schedule': crontab(hour='21',
+        'schedule': crontab(hour='20',
+                            minute=0,
+                            )
+    },
+    'regular_post_22': {
+        'task': 'paster.tasks.regular_post',
+        'schedule': crontab(hour='22',
                             minute=0,
                             )
     },
