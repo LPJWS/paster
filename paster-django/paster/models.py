@@ -278,3 +278,19 @@ class Chat(models.Model):
         ]
         verbose_name = 'Чат'
         verbose_name_plural = 'Чаты'
+
+
+class Source(models.Model):
+    """
+    [Source]
+    Модель источника контента
+    """
+    group_id = models.IntegerField(unique=True, verbose_name='Id паблика')
+    name = models.CharField(max_length=100, verbose_name='Имя паблика')
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.group_id})"
+
+    class Meta:
+        verbose_name = 'Источник'
+        verbose_name_plural = 'Источники'

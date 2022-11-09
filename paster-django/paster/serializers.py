@@ -333,3 +333,13 @@ class ChatSerializer(BaseImageSerializer):
     class Meta:
         model = Chat
         fields = '__all__'
+
+
+class SourceSerializer(BaseImageSerializer):
+    """
+    Сериализатор для источников
+    """
+
+    class Meta:
+        model = Source
+        fields = '__all__'

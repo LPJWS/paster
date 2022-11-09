@@ -135,7 +135,7 @@ def regular_post():
     tgp = Telegraph(TGP_TOKEN)
     
     # time_threshold = datetime.now(timezone.now()) - timedelta(days=14)
-    best = Paste.objects.filter(Q(last_publicate__isnull=True) & ~Q(tags=None))
+    best = Paste.objects.filter(Q(last_publicate__isnull=True) & ~Q(tags=None)).order_by('?')
     if best:
         best = best[0]
     else:

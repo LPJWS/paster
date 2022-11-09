@@ -295,6 +295,19 @@ class PasteView(viewsets.ViewSet):
         else:
             return Response({'status': 'already'})
 
+    @action(methods=['POST'], detail=False, url_path='accumulate', url_name='Accumulate pastes', permission_classes=permission_classes)
+    def accumulate(self, request, *args, **kwargs):
+        data = request.data
+        sources = data.get("sources", [])
+        count = data.get("count", 10)
+        if sources:
+            sources_objects = Source.objects.filter(id__in=sources)
+        else:
+            sources_objects = Source.objects.all()
+        for _ in range(count):
+            paster.utils.accumulate(sources=sources_objects)
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
+
 
 class PasteTagView(viewsets.ViewSet):
     """
@@ -402,3 +415,16 @@ class ChatView(viewsets.ViewSet):
         if created:
             chat.save()
         return Response(self.serializer_class(instance=chat).data, status=status.HTTP_200_OK)
+
+    
+class SourceView(viewsets.ViewSet):
+    """
+    Работа с источниками
+    """
+    permission_classes = (AllowAny, )
+    serializer_class = SourceSerializer
+
+    @action(methods=['GET'], detail=False, url_path='get', url_name='Get sources', permission_classes=permission_classes)
+    def get_sources(self, request, *args, **kwargs):
+        sources = Source.objects.all()
+        return Response(self.serializer_class(instance=sources, many=True).data, status=status.HTTP_200_OK)

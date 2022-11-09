@@ -42,12 +42,14 @@ def send_email(m: str, to: str, s: str):
     server.quit()
 
 
-def accumulate():
+def accumulate(sources=None):
     vk_session = vk_api.VkApi(token=VK_SERVICE)
     vk = vk_session.get_api()
+    if sources is None:
+        sources = Source.objects.all()
     
     while True:
-        group = random.choice(GROUPS)
+        group = random.choice(list(sources)).group_id
         max_num = vk.wall.get(owner_id=-int(group), count=0)['count']
         num = random.randint(1, max_num)
         t = vk.wall.get(owner_id=-int(group), count=1, offset=num)

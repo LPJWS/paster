@@ -12,6 +12,7 @@ router.register(r'tag', PasteTagView, basename='tag')
 router.register(r'member', MemberView, basename='member')
 router.register(r'wall', WallView, basename='wall')
 router.register(r'chat', ChatView, basename='chat')
+router.register(r'source', SourceView, basename='source')
 
 urlpatterns = [
     # path('auth/send/', reset_password),
