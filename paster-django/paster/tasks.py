@@ -90,23 +90,23 @@ def daily_post():
     attach = best.pic_self
 
     # vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, copyright=copyright, attachment=attach)
-    res = vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, attachment=attach)
+    # res = vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, attachment=attach)
 
-    chats = Chat.objects.filter(messages_enabled=True)
-    for chat in chats:
-        try:
-            vk_bot.messages.send(
-                chat_id=chat.chat_id, 
-                random_id=get_random_id(),
-                message="Паста дня",
-                keyboard=paster.utils.get_enable_keyboard(),
-                attachment=f"wall-{os.environ.get('VK_GROUP_ID')}_{res['post_id']}"
-            )
-        except Exception:
-            continue
+    # chats = Chat.objects.filter(messages_enabled=True)
+    # for chat in chats:
+    #     try:
+    #         vk_bot.messages.send(
+    #             chat_id=chat.chat_id, 
+    #             random_id=get_random_id(),
+    #             message="Паста дня",
+    #             keyboard=paster.utils.get_enable_keyboard(),
+    #             attachment=f"wall-{os.environ.get('VK_GROUP_ID')}_{res['post_id']}"
+    #         )
+    #     except Exception:
+    #         continue
 
     best.last_publicate = timezone.now()
-    best.link_self = f"https://vk.com/wall-{os.environ.get('VK_GROUP_ID')}_{res['post_id']}"
+    # best.link_self = f"https://vk.com/wall-{os.environ.get('VK_GROUP_ID')}_{res['post_id']}"
     best.save()
 
     message = tags
@@ -165,9 +165,9 @@ def regular_post():
     attach = best.pic_self
 
     # vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, copyright=copyright, attachment=attach)
-    res = vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, attachment=attach)
+    # res = vk.wall.post(owner_id=f'-{VK_GROUP_ID}', from_group=1, message=message, attachment=attach)
     best.last_publicate = timezone.now()
-    best.link_self = f"https://vk.com/wall-{os.environ.get('VK_GROUP_ID')}_{res['post_id']}"
+    # best.link_self = f"https://vk.com/wall-{os.environ.get('VK_GROUP_ID')}_{res['post_id']}"
     best.save()
 
     message = tags
