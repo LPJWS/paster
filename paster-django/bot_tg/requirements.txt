@@ -1,4 +1,4 @@
-pytelegrambotapi
+pyTelegramBotAPI==4.16.1
 vk_api
 beautifulsoup4
 lxml

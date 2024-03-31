@@ -207,6 +207,36 @@ class Paste(models.Model):
         verbose_name_plural = 'Пасты'
 
 
+class PasteSuggest(models.Model):
+    """
+    [PasteSuggest]
+    Модель пасты из предложки
+    """
+    text = models.TextField(null=True, blank=True, verbose_name='Текст пасты')
+    sender = models.IntegerField(verbose_name='Отправитель')
+    sender_nickname = models.CharField(max_length=150, null=True, blank=True, verbose_name='Имя отправителя')
+
+    @property
+    def anno(self) -> str:
+        result = self.text
+        result = re.sub(r"\s+|\n|\r|\s+|\#[a-zA-ZА-Яа-я_0-9]+", ' ', result)
+        
+        return ' '.join(result.strip().split()[:5]) + '...'
+
+    @property
+    def clear_text(self) -> str:
+        result = self.text
+        result = re.sub(r"\#[a-zA-ZА-Яа-я_0-9]+", ' ', result)
+        return result.strip()
+
+    def __str__(self) -> str:
+        return f"{self.anno} ({self.sender_nickname})"
+
+    class Meta:
+        verbose_name = 'Паста в предложке'
+        verbose_name_plural = 'Пасты в предложке'
+
+
 class Mark(models.Model):
     """
     [Mark]

@@ -360,20 +360,43 @@ class WallView(viewsets.ViewSet):
 
     @action(methods=['GET'], detail=False, url_path='suggests', url_name='Get all suggests', permission_classes=permission_classes)
     def get_suggests_view(self, request, *args, **kwargs):
-        res = paster.utils.get_suggests()
+        # res = paster.utils.get_suggests()
+        pastes = PasteSuggest.objects.all()
+        count = pastes.count()
+        if count == 0:
+            res = {'count': count}
+        else:
+            paste = pastes.first()
+            res = {'count': count, 'item': {"id": paste.id, "text": paste.text}, 'member': {'id': paste.sender, 'name': paste.sender_nickname}}
         return Response(res, status=status.HTTP_200_OK)
+    
+    @action(methods=['POST'], detail=False, url_path='suggests/add', url_name='Add new suggest', permission_classes=permission_classes)
+    def add_suggests_view(self, request, *args, **kwargs):
+        data = request.data
+        serializer = PasteSuggestSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        paste = serializer.save()
+        return Response(PasteSuggestSerializer(instance=paste).data)
 
     @action(methods=['POST'], detail=False, url_path='suggests/post', url_name='Post suggest', permission_classes=permission_classes)
     def post_suggest_view(self, request, *args, **kwargs):
         data = request.data
-        res = paster.utils.post_suggest(data['id'], data['tags'])
-        return Response(res, status=status.HTTP_200_OK)
+        suggest = PasteSuggest.objects.get(id=data['id'])
+        paste = Paste.objects.create(text=suggest.text, link=''.join(random.choices('qwertyuiopasdfghjklzxcvbnm1234567890', k=10)))
+        for tag in data['tags']:
+            paste.tags.add(tag)
+        paste.save()
+        suggest.delete()
+
+        # res = paster.utils.post_suggest(data['id'], data['tags'])
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
     @action(methods=['POST'], detail=False, url_path='suggests/deny', url_name='Deny suggest', permission_classes=permission_classes)
     def deny_suggest_view(self, request, *args, **kwargs):
         data = request.data
-        res = paster.utils.deny_suggest(data['id'])
-        return Response(res, status=status.HTTP_200_OK)
+        PasteSuggest.objects.get(id=data['id']).delete()
+        # res = paster.utils.deny_suggest(data['id'])
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
 
 class ChatView(viewsets.ViewSet):

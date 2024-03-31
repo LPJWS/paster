@@ -308,6 +308,39 @@ class PasteRatingSerializer(BaseImageSerializer):
         fields = ('id', 'clear_text', 'cnt', 'avg', 'rating')
 
 
+class PasteSuggestSerializer(BaseImageSerializer):
+    """
+    Сериализатор для детального отображения паст в предложке
+    """
+    anno = serializers.ReadOnlyField()
+    clear_text = serializers.ReadOnlyField()
+
+    def create(self, validated_data):
+        paste_suggest = PasteSuggest.objects.create(
+            text=validated_data.get('text'), 
+            sender=validated_data.get('sender'), 
+            sender_nickname=validated_data.get('sender_nickname')
+        )
+        paste_suggest.save()
+        return paste_suggest
+
+    # def delete(self, instance, validated_data):
+    #     try:
+    #         member = Member.objects.get(vk_id=validated_data.get('vk_id'))
+    #     except Member.DoesNotExist:
+    #         member_serializer = MemberSerializer(data=validated_data)
+    #         member_serializer.is_valid(raise_exception=True)
+    #         member = member_serializer.save()
+    #     if not member.is_moder:
+    #         raise ValidationError({"info": "You are not allowed"})
+    #     instance.delete()
+    #     return True
+
+    class Meta:
+        model = PasteSuggest
+        fields = '__all__'
+
+
 class MarkSerializer(BaseImageSerializer):
     paste = PasteListSerializer()
 

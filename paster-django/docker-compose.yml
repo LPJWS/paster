@@ -56,16 +56,16 @@ services:
     depends_on:
       - paster-web
 
-  # paster-bot-tg:
-  #   restart: always
-  #   build: ./bot_tg
-  #   env_file: .env
-  #   container_name: paster-bot-tg
-  #   command: bash -c "python paster.py"
-  #   volumes:
-  #     - ./bot_tg:/bot_tg
-  #   depends_on:
-  #     - paster-web
+  paster-bot-tg:
+    restart: always
+    build: ./bot_tg
+    env_file: .env
+    container_name: paster-bot-tg
+    command: bash -c "python paster.py"
+    volumes:
+      - ./bot_tg:/bot_tg
+    depends_on:
+      - paster-web
 
   celery-paster:
     restart: unless-stopped
