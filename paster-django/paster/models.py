@@ -125,7 +125,7 @@ class Paste(models.Model):
     tags = models.ManyToManyField(PasteTag, blank=True, verbose_name="Теги")
     link_self = models.CharField(max_length=150, null=True, blank=True, verbose_name='Ссылка на пасту (в пастере)')
     pic_self = models.CharField(max_length=100, blank=True, null=True, verbose_name="Картинка")
-    pic_link_self = models.CharField(max_length=250, blank=True, null=True, verbose_name="Ссылка на картинку")
+    pic_link_self = models.CharField(max_length=500, blank=True, null=True, verbose_name="Ссылка на картинку")
 
     @property
     def avg(self) -> float:
